@@ -1,3 +1,5 @@
+Started 03-02
+
 # Data Types
 https://launchschool.com/books/python/read/data_types
 
@@ -313,4 +315,52 @@ nums -= {3, 5}
 nums   # {1, 7}
 ```
 
+## Slicing
+
+- `list[start:stop]`
+- `list[start::next]` (only once)
+- Start empty defaults to 0
+- Stop empty defaults to list length
+- ` 
+
+```py
+seq = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print(seq[3:7])       # [4, 5, 6, 7]
+print(seq[-6:-2])     # [5, 6, 7, 8]
+print(seq[2:8:2])     # [3, 5, 7]
+print(seq[3:3])       # []
+print(seq[:])         # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print(seq[::-1])      # [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+```
+
 COME BACK TO ID/DIR
+
+# Similar functions
+
+- index => indexOf
+- zip() => zip (Ruby)
+- dict.keys() => Object.keys()
+    - Returns a dictionary view object
+        - Any mutations to dict will be reflected here
+- dict.values() => Object.values()
+- dict.items() => Object.entries()
+- append => push
+- insert(index, val) => splice()
+- pop(index) => pop() (defaults to last element)
+- sort(reverse=True)
+String
+- capitalize (same as Ruby)
+    - title (capitalizes every word)
+        - capwords is better
+- swapcase (same as Ruby)
+- split (same as Ruby)
+- get => Set.get() (if not found, returns `None`)
+- join is a *string method* rather than a list method
+    - `delimiter.join(list)`
+- replace => replace
+- in => operator similar to includes or include?
+- continue (keyword) => continue (JS)
+- LOOK MORE INTO COMPREHENSIONS
+- import => require
+    - math => Math
+    - datetime => Date
