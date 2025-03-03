@@ -352,6 +352,7 @@ String
 - capitalize (same as Ruby)
     - title (capitalizes every word)
         - capwords is better
+- lower() => toLowerCase (JS) downcase (Ruby)
 - swapcase (same as Ruby)
 - split (same as Ruby)
 - get => Set.get() (if not found, returns `None`)
@@ -364,3 +365,5 @@ String
 - import => require
     - math => Math
     - datetime => Date
+- Similar to Ruby, if we don't use a variable, use `_`
+- input() => gets() (Ruby)
