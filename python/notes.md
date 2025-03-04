@@ -367,3 +367,4 @@ String
     - datetime => Date
 - Similar to Ruby, if we don't use a variable, use `_`
 - input() => gets() (Ruby)
+- `random` is its own module
