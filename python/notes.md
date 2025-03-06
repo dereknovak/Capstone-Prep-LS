@@ -394,3 +394,213 @@ my_function()
 - abs() => Math.abs (Do not need math module)
 - LOOK INTO REGEX
     - Specifically matching
+
+# Object Oriented Programming
+
+## Magic Method
+
+- Magic methods are any methods whose name begins and ends with a double underscore.
+- `__init__`
+
+```py
+print(f'I am a {type(derek).__name__} object')
+print(f'I am a {derek.__class__.__name__} object')
+```
+
+### __str__
+
+- Returns a string representation of object
+- Can be overridden in your class
+- When searching for `str` constructor function, Python looks for `__str__` in ancestor chain. If none is found, it does the same thing for `__repr__`. If none is found, a string like `<__main__.MyType object at 0x1052828a0>` is returned
+    - This is the same process for `repr`, but without searching `__str__` first
+
+```py
+class Cat:
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f'Cat({repr(self.name)})'
+
+cat = Cat('Fuzzy')
+print(str(cat))  # Fuzzy
+print(repr(cat)) # Cat('Fuzzy')
+```
+
+### Equality
+
+Operator	Method	Description
+- `==`	|  `__eq__`  |	Equal to
+- `!=`	|  `__ne__`  |	Not equal to
+- `<`   |  `__lt__`  |	Less than
+- `<=`	|  `__le__`  |	Less than or equal to
+- `>`   |  `__gt__`  |	Greater than
+- `>=`	|  `__ge__`  |	Greater than or equal to
+
+
+
+## Constructor Function
+
+```py
+class Dog(Pet)
+
+    def __init__(self, name):
+        self.name = name
+
+```
+
+- What happens during Object Instantiation:
+    1. Constructor first calls static method `__new__`
+        - `ConstructorFunction.__new__`
+    2. Constructor initializes object using `__init__`
+
+## Instance methods
+    
+- Must always include first parameter as `self`
+
+```py
+class GoodDog:
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def speak(self):
+        return 'Arf!'
+
+sparky = GoodDog('Sparky', 5)
+print(sparky.speak())
+```
+
+## Privacy
+
+- Prefix a method/property with `_`
+    - This does not prevent changes, but shows other devs that it shouldn't be messed with
+
+```py
+class GoodDog:
+
+    def __init__(self, name, age):
+        self._name = name
+        self._age = age
+
+    def speak(self):
+        return f'{self._name} says arf!'
+
+    def _dog_years(self):
+        return self._age * 7
+
+    def show_age(self):
+        print(f'My age in dog years is {self._dog_years()}')
+
+# Omitted code
+```
+
+## Decorators
+
+- Use `@property` to create getter methods for a property
+    - Allows property getting/setting to have more functionality
+    - Getter does not have to use `()` to be invoked
+
+```py
+class GoodDog:
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def speak(self):
+        return f'{self.name} says arf!'
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, new_name):
+        self._name = new_name
+
+sparky = GoodDog('Sparky', 5)
+sparky.name = 'Fido'  # Uses `@name.setter` method to reassign `_name`
+print(sparky.name)    # Uses `name` getter method to return `_name`
+```
+
+## Class Methods
+
+- Use `@classmethod` decorator
+- Use `cls` in place of `self` for these methods
+
+```py
+class GoodCat():
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def what_am_i(cls):
+        print("I'm a GoodCat class!")
+
+
+GoodCat.what_am_i()
+
+cat = GoodCat()  # Call method directly on class
+cat.what_am_i()  # Possible, but should be avoided
+```
+
+## Class Variables
+
+- Defined at top of class and are available to all instances
+- Access via `ClassConstructor.class_variable`
+- Affected by inheritance
+- Can use Class Constants in same format, but functionality does not change
+
+```py
+class GoodCat:
+
+    counter = 0                  # class variable
+
+    def __init__(self):
+        GoodCat.counter += 1
+
+    @classmethod
+    def number_of_cats(cls):
+        return GoodCat.counter
+
+class ReallyGoodCat(GoodCat):
+    pass
+
+cat1 = GoodCat()
+cat2 = GoodCat()
+cat3 = ReallyGoodCat()
+
+print(GoodCat.number_of_cats())        # 3
+print(GoodCat.counter)                 # 3
+print(ReallyGoodCat.number_of_cats())  # 3
+print(ReallyGoodCat.counter)           # 3
+```
+
+## Static Methods
+
+- Provide functionality to class instance, but do not require any information and therefore do not need `self` or `cls`
+
+```py
+class TheGame:
+    # Game playing code goes here
+
+    def play(self):
+        pass
+
+    @staticmethod
+    def show_rules():
+        print('These are the rules of the game')
+        # The rules go here.
+
+TheGame.show_rules()
+
+game = TheGame()
+game.play()
+```
