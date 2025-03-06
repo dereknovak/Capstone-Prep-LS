@@ -317,11 +317,10 @@ nums   # {1, 7}
 
 ## Slicing
 
-- `list[start:stop]`
-- `list[start::next]` (only once)
+- `list[start:stop:step]`
 - Start empty defaults to 0
 - Stop empty defaults to list length
-- ` 
+- Step empty defaults to 1
 
 ```py
 seq = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -331,7 +330,18 @@ print(seq[2:8:2])     # [3, 5, 7]
 print(seq[3:3])       # []
 print(seq[:])         # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 print(seq[::-1])      # [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+print(seq[::2])       # [1, 3, 5, 7, 9]
 ```
+
+# Sorting
+
+## sort
+
+- Mutates the list in place and returns `None`
+
+## sorted
+
+- Returns a copy of the list, sorted
 
 COME BACK TO ID/DIR
 
@@ -368,3 +378,19 @@ String
 - Similar to Ruby, if we don't use a variable, use `_`
 - input() => gets() (Ruby)
 - `random` is its own module
+- Python can detect if a variable is declared within the scope of its execution - if this occurs after the execution, Python will raise an error
+```py
+a = 1
+
+def my_function():
+    print(a)
+    a = 2
+
+my_function()
+```
+- list(string) => split('')
+- isinstance(value, literal) => typeof
+- to delete a property within a dictionary, use `del` keyword
+- abs() => Math.abs (Do not need math module)
+- LOOK INTO REGEX
+    - Specifically matching
