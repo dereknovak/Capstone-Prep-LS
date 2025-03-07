@@ -413,6 +413,9 @@ print(f'I am a {derek.__class__.__name__} object')
 - Can be overridden in your class
 - When searching for `str` constructor function, Python looks for `__str__` in ancestor chain. If none is found, it does the same thing for `__repr__`. If none is found, a string like `<__main__.MyType object at 0x1052828a0>` is returned
     - This is the same process for `repr`, but without searching `__str__` first
+- Defining the instance method `__str__` will change input for the following:
+    - `print`
+    - `self`
 
 ```py
 class Cat:
