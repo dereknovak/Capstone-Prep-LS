@@ -63,6 +63,11 @@ Install Flask
 
 ```
 poetry add flask
+
+OR
+
+poetry lock
+poetry install
 ```
 If you encounter any error messages (especially on Cloud9), you may need to troubleshoot according to the instructions provided in the assignment.
 
@@ -78,31 +83,37 @@ poetry run python app.py
 - Use within `layout.html` to allow it to be used as a layout
 
 ```html
-{% extends "layout.html" %}
-
-{% block content %}
-<h2 class="content-subhead">Table of Contents</h2>
-
-<div class="pure-menu">
-  <ul class="pure-menu-list">
-    {% for chapter in contents %}
-      <li class="pure-menu-item">
-        <a href="#" class="pure-menu-link">{{ chapter }}</a>
-      </li>
-    {% endfor %}
-  </ul>
-</div>
-{% endblock %}
+  <body>
+    <header>
+      <h1>Todo Tracker</h1>
+      <div class="actions">
+        {% block header_links %}
+        <!-- Filled in by the `header_links` block from another template file -->
+        {% endblock %}
+      </div>
+    </header>
+    <main>
+      {% block content %}
+      <!-- Filled in by the `content` block from another template file -->
+      {% endblock %}
+    </main>
+  </body>
+</html>
 ```
 
 ```html
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
 {% block content %}
-  <h2 class="content-subhead">{{ chapter_title }}</h2>
+  {% if lists %}
+    <p>You have some lists. We need to display them.</p>
+  {% else %}
+    <p id="no_list">You don't have any todo lists. Why not create one?</p>
+  {% endif %}
+{% endblock %}
 
-  {{ chapter }}
-
+{% block header_links %}
+  <a class="add" href="/lists/new">New List</a>
 {% endblock %}
 ```
 
@@ -116,3 +127,12 @@ poetry run python app.py
 - templates folder => views (Ruby)
 - `@app.before_request` => `before` (Ruby)
 - `@app.errorhandler(404)` => `not_found` (Ruby)
+- render_template('file.html') => erb :file (Ruby)
+- Templating with Jinja2
+    - `{{ variable }}` => `<%= variable %>` (Ruby)
+    - `{% statement %}` => `<% statement %>` (Ruby)
+- session => session (Ruby)
+- Accessing form input:
+    - `request.form['input_for'].strip()` => `params[:list_for].strip` (Ruby)
+- ANY TIME YOU MODIFY SESSION
+    - Include `session.modified = True` to allow temporary modification
