@@ -1,4 +1,8 @@
-Started 03-02
+Started 03-02 => 03-10
+- Finished Most of todoApp
+- Have a decent grasp on Python
+- Need better familiarity with built-in functions
+- Understand the basics of comprehensions, need more practice
 
 # Data Types
 https://launchschool.com/books/python/read/data_types
@@ -379,6 +383,8 @@ String
 - input() => gets() (Ruby)
 - `random` is its own module
 - Python can detect if a variable is declared within the scope of its execution - if this occurs after the execution, Python will raise an error
+- enumerate() => each_with_index (Ruby)
+    - Allows an iteratable to keep track of index
 ```py
 a = 1
 

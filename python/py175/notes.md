@@ -136,3 +136,4 @@ poetry run python app.py
     - `request.form['input_for'].strip()` => `params[:list_for].strip` (Ruby)
 - ANY TIME YOU MODIFY SESSION
     - Include `session.modified = True` to allow temporary modification
+- Don't forget to update href link to use `url_for` after creating a route
