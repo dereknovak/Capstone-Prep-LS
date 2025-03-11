@@ -18,3 +18,9 @@ https://react.dev/reference/react/Fragment
 
 - Allow you to group elements without a wrapper node
 - LOOK MORE INTO THE PURPOSE OF THIS
+
+# Extra to organize later
+
+- Every child in a list should have a unique `key` property
+- When interpolating JS code into the returned HTML, use `{}`
+
