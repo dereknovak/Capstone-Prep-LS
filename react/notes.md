@@ -4,6 +4,7 @@ https://react.dev/learn/your-first-component
 - Components are one of the core concepts of React. They are the foundation upon which you build user interfaces (UI),
 - Components return JS that builds HTML in the DOM
 - Must always be capitalized
+- Do not define components *within* other components.
 
 - In React, the individual things rendered in braces must be primitive values, such as numbers or strings.
 
@@ -23,4 +24,5 @@ https://react.dev/reference/react/Fragment
 
 - Every child in a list should have a unique `key` property
 - When interpolating JS code into the returned HTML, use `{}`
+- Do NOT mutate the state of a component. While this will work, it can introduce bugs. Instead, return modified copies of the object.
 

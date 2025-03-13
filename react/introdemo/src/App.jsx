@@ -1,18 +1,25 @@
 import { useState } from 'react';
 
 const App = () => {
-  const [ counter, setCounter ] = useState(0);
+  const [value, setValue] = useState(10)
+
+  const setToValue = (newValue) => () => {
+    setValue(newValue);
+  };
 
   return (
     <div>
-      <div>{ counter }</div>
-      <button onClick={() => setCounter(counter + 1)}>
-        plus
-      </button>
-      <button onClick={() => setCounter(0)}>
-        zero
-      </button>
+      {value}
+      <Button onClick={ setToValue(1000) } text='Thousand' />
+      <Button onClick={ setToValue(0) } text='Reset' />
+      <Button onClick={ setToValue(value + 1) } text='Increment' />
     </div>
+  )
+}
+
+const Button = ({ onClick, text }) => {
+  return (
+    <button onClick={ onClick }>{ text }</button>
   );
 };
 
