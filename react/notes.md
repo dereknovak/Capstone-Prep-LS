@@ -5,6 +5,14 @@ https://react.dev/learn/your-first-component
 - Components return JS that builds HTML in the DOM
 - Must always be capitalized
 - Do not define components *within* other components.
+- Components are saved individually in the `./src/components` directory.
+```jsx
+export Default ComponentName;
+
+//
+
+import ComponentName from './components/ComponentName'; // Do not include `.jsx'
+```
 
 - In React, the individual things rendered in braces must be primitive values, such as numbers or strings.
 
