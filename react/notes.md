@@ -33,4 +33,13 @@ https://react.dev/reference/react/Fragment
 - Every child in a list should have a unique `key` property
 - When interpolating JS code into the returned HTML, use `{}`
 - Do NOT mutate the state of a component. While this will work, it can introduce bugs. Instead, return modified copies of the object.
+- Install React Dev Tools extension for browser
 
+# Setup
+
+```
+npm create vite@latest AppName -- --template react
+cd AppName
+npm install
+npm run dev
+```
