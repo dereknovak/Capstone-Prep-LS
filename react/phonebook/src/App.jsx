@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import appService from './services/persons';
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '(123)456-7890', id: 1 },
-    { name: 'Ada Lovelace', number: '(456)789-1230', id: 2 },
-    { name: 'Dan Abramov', number: '(789)456-1230', id: 3 },
-    { name: 'Mary Poppendieck', number: '(123)789-4560', id: 4 }
-  ]);
+  const [persons, setPersons] = useState([]);
+
+  const hook = () => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data);
+      });
+  };
+
+  useEffect(hook, []);
 
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
@@ -17,8 +24,8 @@ const App = () => {
     return personName === filter.toLowerCase();
   });
 
-  const personExists = () => {
-    return persons.map(person => person.name).includes(newName);
+  const findPerson = () => {
+    return persons.find(person => person.name === newName);
   };
 
   const formatPhone = () => {
@@ -32,19 +39,56 @@ const App = () => {
   const handleFormSubmission = (e) => {
     e.preventDefault();
 
-    if (personExists()) {
-      alert(`${newName} is already added to phonebook`);
-      return;
-    }
-
     const newPerson = {
-      id: persons.length + 1,
       name: newName,
       number: formatPhone(newPhone),
     };
 
-    setPersons(persons.concat(newPerson));
-    setNewName('') || setNewPhone('');
+    const foundPerson = findPerson();
+    if (foundPerson) {
+      const confirmed = confirm(`${newName} is already added to phonebook.` +
+            'Replace the old number with a new one?');
+
+      if (confirmed) {
+        newPerson.id = foundPerson.id;
+
+        appService
+          .update(foundPerson.id, newPerson)
+          .then(() => {
+            setPersons(persons.map(person => {
+              return person.id === newPerson.id
+                ? newPerson
+                : person;
+          }));
+        });
+      }
+    } else {
+      newPerson.id = String(persons.length + 1);
+
+      appService
+        .create(newPerson)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson));
+        });
+    }
+
+    setNewName('');
+    setNewPhone('');
+  };
+
+  const handlePersonDelete = (id) => () => {
+    const person = persons.find(p => p.id === id);
+    const confirmed = confirm(`Delete ${person.name}?`);
+
+    if (confirmed) {
+      appService
+        .remove(person.id)
+        .then((value) => {
+          console.log(value);
+          const personsCopy = persons.filter(p => p.id !== id);
+          setPersons(personsCopy);
+        });
+      }
   };
 
   const handleNameChange = (e) => setNewName(e.target.value);
@@ -61,7 +105,8 @@ const App = () => {
                   formSubmission={handleFormSubmission}
                   nameChange={handleNameChange}
                   phoneChange={handlePhoneChange} />
-      <Numbers persons={filteredPersons} />
+      <Numbers persons={filteredPersons}
+               personDelete={handlePersonDelete} />
     </div>
   );
 };
@@ -104,25 +149,32 @@ const PersonForm = ({ name, number, ...handlers }) => {
   );
 };
 
-const Numbers = ({ persons }) => {
+const Numbers = ({ persons, ...handlers }) => {
   return (
     <>
       <h2>Numbers</h2>
       <dl>
         {persons.map(person =>
           <Person key={person.id}
+                  id={person.id}
                   name={person.name}
-                  number={person.number} />
+                  number={person.number}
+                  personDelete={handlers.personDelete} />
         )}
       </dl>
   </>
   );
 };
 
-const Person = ({ name, number }) => {
+const Person = ({ id, name, number, ...handlers }) => {
   return (
     <>
-      <dt>{name}</dt>
+      <dt>
+        {name}
+        <button onClick={handlers.personDelete(id)}>
+          Delete
+        </button>
+      </dt>
       <dd>{number}</dd>
     </>
   );

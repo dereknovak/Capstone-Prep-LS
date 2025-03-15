@@ -6,6 +6,8 @@ https://react.dev/learn/your-first-component
 - Must always be capitalized
 - Do not define components *within* other components.
 - Components are saved individually in the `./src/components` directory.
+- As always, a call to a state-updating function triggers the re-rendering of the component.
+
 ```jsx
 export Default ComponentName;
 
@@ -34,6 +36,7 @@ https://react.dev/reference/react/Fragment
 - When interpolating JS code into the returned HTML, use `{}`
 - Do NOT mutate the state of a component. While this will work, it can introduce bugs. Instead, return modified copies of the object.
 - Install React Dev Tools extension for browser
+- `<StrictMode>` will invoke `useEffect` twice when in development mode to help catch potential side effects
 
 # Setup
 
@@ -42,4 +45,24 @@ npm create vite@latest AppName -- --template react
 cd AppName
 npm install
 npm run dev
+```
+
+# State-hooks
+
+# Effect-hooks
+https://fullstackopen.com/en/part2/getting_data_from_server
+
+- "Effects let a component connect to and synchronize with external systems. This includes dealing with network, browser DOM, animations, widgets written using a different UI library, and other non-React code."
+- Take 2 parameters
+    1. The hook itself (a function)
+    2. Specifies how often the effect is run
+        - Empty array => effect is only run along with the first render of the component
+
+# Start JSON server without separate installation
+
+```
+npx json-server --port 3001 db.json` in root directory
+npm install axios
+npm install json-server --save-dev (during development)
+// add "server: "json-server -p 3001 db.json" to end of `"scripts"` in `package.json`
 ```
