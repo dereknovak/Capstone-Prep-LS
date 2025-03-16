@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import appService from './services/persons';
+import './index.css'
+
+const EMPTY_MESSAGE = { message: null, status: null };
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -18,6 +21,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [filter, setFilter] = useState('');
+  const [message, setMessage] = useState({ ...EMPTY_MESSAGE });
 
   const filteredPersons = persons.filter(person => {
     const personName = person.name.toLowerCase().slice(0, filter.length);
@@ -34,6 +38,11 @@ const App = () => {
     const second = newPhone.slice(6, 10);
 
     return `(${area})${first}-${second}`;
+  };
+
+  const displayMessage = (text, status) => {
+    setMessage({ text, status });
+    setTimeout(() => setMessage({ ...EMPTY_MESSAGE }), 5000);
   };
 
   const handleFormSubmission = (e) => {
@@ -55,12 +64,18 @@ const App = () => {
         appService
           .update(foundPerson.id, newPerson)
           .then(() => {
-            setPersons(persons.map(person => {
-              return person.id === newPerson.id
-                ? newPerson
-                : person;
-          }));
-        });
+            setPersons(persons.map(person => person.id === newPerson.id
+              ? newPerson
+              : person
+          ))})
+          .catch(() => {
+            const errorMessage = `Information of ${newPerson.name} has already ` +
+                           'been removed from the server.';
+                           
+            displayMessage(errorMessage, 'error');
+            const personsCopy = persons.filter(p => p.id !== newPerson.id);
+            setPersons(personsCopy);
+          });
       }
     } else {
       newPerson.id = String(persons.length + 1);
@@ -69,6 +84,7 @@ const App = () => {
         .create(newPerson)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson));
+          displayMessage(`Added ${newPerson.name}`, 'success');
         });
     }
 
@@ -83,8 +99,7 @@ const App = () => {
     if (confirmed) {
       appService
         .remove(person.id)
-        .then((value) => {
-          console.log(value);
+        .then(() => {
           const personsCopy = persons.filter(p => p.id !== id);
           setPersons(personsCopy);
         });
@@ -98,6 +113,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter filter={filter} filterChange={handleFilterChange} />
 
       <PersonForm name={newName}
@@ -177,6 +193,17 @@ const Person = ({ id, name, number, ...handlers }) => {
       </dt>
       <dd>{number}</dd>
     </>
+  );
+};
+
+const Notification = ({ message } ) => {
+  const { text, status } = message;
+  if (!status) return null;
+
+  return (
+    <div className={`message ${status}`}>
+      {text}
+    </div>
   );
 };
 
