@@ -66,3 +66,35 @@ npm install axios
 npm install json-server --save-dev (during development)
 // add "server: "json-server -p 3001 db.json" to end of `"scripts"` in `package.json`
 ```
+
+# Express
+
+- Use `--watch` flag when running `npm --watch index.js` to prevent server restart w/ every change
+    - You can also define this in `"scripts"` with `"dev"`
+
+# Morgan
+https://github.com/expressjs/morgan
+
+- Use the `morgan` middleware for logging request information
+
+```
+npm install morgan
+```
+
+- Add to `index.js` and use alongside `app.use`
+
+```js
+const express = require('express');
+const morgan = require('morgan');
+const app = express();
+
+app.use(morgan('tiny'));
+```
+
+## Tokens
+
+:method
+:url
+:status
+:res[content-length]
+:response-time ms'
