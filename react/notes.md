@@ -98,3 +98,12 @@ app.use(morgan('tiny'));
 :status
 :res[content-length]
 :response-time ms'
+
+# Cors
+
+- Install `cors` to the backend app using `npm install cors`, then add as middleware to the program
+
+```js
+const cors = require('cors');
+app.use(cors());
+```
