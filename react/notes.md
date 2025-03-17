@@ -107,3 +107,8 @@ app.use(morgan('tiny'));
 const cors = require('cors');
 app.use(cors());
 ```
+
+# React Router
+https://fullstackopen.com/en/part7/react_router
+
+- Excelent solution for manageing navigation in a React application

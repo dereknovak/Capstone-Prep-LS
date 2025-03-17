@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import Note from './components/Note';
 import noteService from './services/notes';
+import loginService from './services/login';
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link
+} from 'react-router-dom';
 
 
 const App = () => {
@@ -8,6 +13,13 @@ const App = () => {
   const [newNote, setNewNote] = useState('');
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null);
+
+  const padding = {
+    padding: 5,
+  };
 
   useEffect(() => {
     noteService
@@ -55,14 +67,95 @@ const App = () => {
     setNewNote(e.target.value);
   };
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const user = await loginService.login({
+        username, password,
+      });
+
+      noteService.setToken(user.token);
+      setUser(user);
+      setUsername('');
+      setPassword('');
+    } catch {
+      setErrorMessage('Wrong credentials');
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
   const notesToShow = showAll
     ? notes
     : notes.filter(note => note.important);
 
+  const loginForm = () => (
+    <form onSubmit={handleLogin}>
+      <div>
+        username
+          <input
+          type="text"
+          value={username}
+          name="Username"
+          onChange={({ target }) => setUsername(target.value)}
+        />
+      </div>
+      <div>
+        password
+          <input
+          type="password"
+          value={password}
+          name="Password"
+          onChange={({ target }) => setPassword(target.value)}
+        />
+      </div>
+      <button type="submit">login</button>
+    </form>      
+  );
+
+  const noteForm = () => (
+    <form onSubmit={addNote}>
+      <input
+        value={newNote}
+        onChange={handleNoteChange}
+      />
+      <button type="submit">save</button>
+    </form>  
+  );
+
   return (
     <div>
+      <Router>
+        <div>
+          <Link style={padding} to='/'>Home</Link>
+          <Link style={padding} to='/notes'>Notes</Link>
+          <Link style={padding} to='/users'>Users</Link>
+        </div>
+
+        <Routes>
+          <Route path='/notes' element={<Notes />} />
+          <Route path='/users' element={<Users />} />
+          <Route path='/' element={<Home />} />
+        </Routes>
+
+        <div>
+          <i>Note app, Department Of CS, Launch School</i>
+        </div>
+      </Router>
       <h1>Notes</h1>
       <Notification message={errorMessage} />
+
+      {
+        user === null
+          ? loginForm()
+          : <div>
+              <p>{user.name} logged-in</p>
+              {noteForm()}
+            </div>
+      }
+
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           Show {showAll ? 'important' : 'all'}
@@ -115,5 +208,17 @@ const Footer = () => {
     </div>
   );
 };
+
+const Home = () => (
+  <div> <h2>TKTL notes app</h2> </div>
+)
+
+const Notes = () => (
+  <div> <h2>Notes</h2> </div>
+)
+
+const Users = () => (
+  <div> <h2>Users</h2> </div>
+)
 
 export default App 
