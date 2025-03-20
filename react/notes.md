@@ -37,6 +37,14 @@ https://react.dev/reference/react/Fragment
 - Do NOT mutate the state of a component. While this will work, it can introduce bugs. Instead, return modified copies of the object.
 - Install React Dev Tools extension for browser
 - `<StrictMode>` will invoke `useEffect` twice when in development mode to help catch potential side effects
+- When using a separate route module within an express app, the route itself should be to `'/'`, and the imported route used with `app.use` can use the full route name.
+```ts
+router.get('/', (_req, res: Response<Diagnosis[]>) => {})
+
+//
+
+app.use('/api/diagnoses', diagnosesRouter);
+```
 
 # Setup
 
