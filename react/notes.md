@@ -50,6 +50,9 @@ app.use('/api/diagnoses', diagnosesRouter);
 
 ```
 npm create vite@latest AppName -- --template react
+or
+npm create vite@latest AppName -- --template react-ts
+
 cd AppName
 npm install
 npm run dev
