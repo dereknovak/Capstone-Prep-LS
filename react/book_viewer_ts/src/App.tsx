@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
+import { MouseEvent } from 'react';
+
+import Menu from './components/Menu';
+import Header from './components/Header';
+import Content from './components/Content';
+
 const baseURL = 'http://localhost:3000/api';
 
 function App() {
@@ -17,91 +23,56 @@ function App() {
     }
   };
 
-  const fetchChapter = async () => {
-    const path = chapterToPath();
-    console.log('hello');
+  const fetchChapter = async (chapterName: string) => {
+    const path = chapterToPath(chapterName);
     const response = await axios.get(`${baseURL}/${path}`);
     setContent(response.data);
   }
 
-  const chapterToPath = () => {
-    return chapter.toLowerCase().split(' ').join('-');
+  const chapterToPath = (name: string) => {
+    return name.toLowerCase().split(' ').join('-');
   };
 
   useEffect(() => {
     fetchTOC();
   }, []);
 
-  const handleLink = (e) => {
+  const handleLink = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    setChapter(e.target.textContent);
-    setTOC([]);
-    fetchChapter();
+
+    const target = e.target as HTMLAnchorElement;
+    const chapterName = target.textContent || '';
+
+    setChapter(chapterName);
+    fetchChapter(chapterName);
+  };
+
+  const handleHomeNav = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setChapter('');
   };
 
   return (
     <div>
       <div id="layout">
-        <a href="#menu" id="menuLink" className="menu-link">
+        <a href='#' onClick={handleHomeNav} id="menuLink" className="menu-link">
             <span></span>
         </a>
-
-        <div id="menu">
-            <div className="pure-menu">
-                <a className="pure-menu-heading" href="/">Table of Contents</a>
-
-                <ul className="pure-menu-list">
-                  <li className="pure-menu-item">
-                    <a href="#" className="pure-menu-link">Chapter 1</a>
-                  </li>
-                </ul>
-            </div>
-        </div>
-
+        <Menu toc={toc}
+              handleLink={handleLink}
+              handleHomeNav={handleHomeNav} />
         <div id="main">
           <Header />
           <Content toc={toc}
-                   chapter={chapter} />
+                   chapter={chapter}
+                   handleLink={handleLink}
+                   content={content} />
         </div>
     </div>
     <script type="text/javascript" src="static/javascripts/ui.js"></script>
   </div>
   );
 }
-
-const Content = ({ toc, chapter }) => {
-  if (toc.length > 0) {
-    return (
-      <div className="content">
-        <h2 className="content-subhead">Table of Contents</h2>
-
-        <div className="pure-menu">
-          <ul className="pure-menu-list">
-            { toc.map((chapter: string, idx: number) =>
-                <li className='pure-menu-item' key={idx}>
-                  <a href='#' className='pure-menu-link'>{chapter}</a>
-                </li>)}
-          </ul>
-        </div>
-      </div>
-    );
-  } else {
-    return (
-      <p>CHAPTER!</p>
-    );
-  }
-};
-
-const Header = () => {
-  return (
-    <div className="header">
-      <h1>The Adventures of Sherlock Holmes</h1>
-      <h2>by Sir Arthur Doyle</h2>
-    </div>
-  );
-};
-
-
 
 export default App
 
