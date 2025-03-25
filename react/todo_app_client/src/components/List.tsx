@@ -1,8 +1,13 @@
 import type { TodoListTools } from "../types";
-import { openModal } from "../utilities/shared";
+import { emptyTodo, openModal } from "../utilities/shared";
 import Todo from "./Todo";
 
 const List: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
+  const addNewTodo = () => {
+    openModal();
+    setTodo(emptyTodo);
+  };
+
   return (
     <>
       <header>
@@ -11,7 +16,7 @@ const List: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
           <dd>{todos.length}</dd>
         </dl>
       </header>
-      <label onClick={openModal}>
+      <label onClick={addNewTodo}>
         <img src='src/assets/images/plus.png' alt='Add Todo Item' />
         <h2>Add new Todo</h2>
       </label>

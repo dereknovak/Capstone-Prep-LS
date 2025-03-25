@@ -16,3 +16,5 @@ export interface TodoListTools {
   todo: Todo;
   setTodo: React.Dispatch<React.SetStateAction<Todo>>;
 }
+
+export type FormElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;

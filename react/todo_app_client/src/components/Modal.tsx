@@ -1,9 +1,9 @@
 import { ChangeEvent } from 'react';
-import type { Todo, TodoListTools } from '../types';
+import type { FormElement, Todo, TodoListTools } from '../types';
 import { closeModal, emptyTodo } from '../utilities/shared';
 
 const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
-  const addToList = (e: Event) => {
+  const addToList = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTodos(todos.concat({
       ...todo,
@@ -14,15 +14,21 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
     closeModal();
   };
 
-  const updateText = (e: ChangeEvent<HTMLInputElement>) => {
+  const updateText = (e: ChangeEvent<FormElement>) => {
+    const target = e.target as FormElement;
+
     setTodo({
       ...todo,
-      [e.target.name]: e.target.value,
+      [target.name]: target.value,
     });
   }
 
   const generateId = () => {
     return Math.max(...todos.map((todo: Todo) => todo.id)) + 1 || 0
+  };
+
+  const handleCompleteButton = () => {
+    // Working on implementing a way to check if Modal form is new for Complete button
   };
 
   return (
@@ -31,17 +37,25 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
            id='modal_layer'
            onClick={closeModal}></div>
       <div className='modal' id='form_modal'>
-        <form action='' method='POST' onChange={updateText} onSubmit={addToList}>
+        <form action='' method='POST' onSubmit={addToList}>
           <fieldset>
             <ul>
               <li>
                 <label>Title</label>
-                <input type='text' id='title' name='title' placeholder='Item 1' value={todo.title} />
+                <input type='text'
+                       id='title'
+                       name='title'
+                       placeholder='Item 1'
+                       value={todo.title}
+                       onChange={updateText} />
               </li>
               <li>
                 <label>Due Date</label>
                 <div className='date'>
-                  <select id='due_day' name='day' value={todo.day}>
+                  <select id='due_day'
+                          name='day'
+                          value={todo.day}
+                          onChange={updateText}>
                     <option>Day</option>
                     <option value='01'>1</option>
                     <option value='02'>2</option>
@@ -75,7 +89,10 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
                     <option value='30'>30</option>
                     <option value='31'>31</option>
                   </select>
-                  <select id='due_month' name='month' value={todo.month}>
+                  <select id='due_month'
+                          name='month'
+                          value={todo.month}
+                          onChange={updateText}>
                     <option>Month</option>
                     <option value='01'>January</option>
                     <option value='02'>February</option>
@@ -90,7 +107,10 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
                     <option value='11'>November</option>
                     <option value='12'>December</option>
                   </select>
-                  <select id='due_year' name='year' value={todo.year}>
+                  <select id='due_year'
+                          name='year'
+                          value={todo.year}
+                          onChange={updateText}>
                     <option>Year</option>
                     <option>2014</option>
                     <option>2015</option>
@@ -109,11 +129,12 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
               </li>
               <li>
                 <label>Description</label>
-                <textarea cols={50} name='description' rows={7} placeholder='Description' value={todo.description}></textarea>
+                <textarea cols={50} name='description' rows={7} placeholder='Description' value={todo.description} onChange={updateText}></textarea>
               </li>
               <li>
                 <input type='submit' value='Save' />
-                <button name='complete'>Mark as Complete</button>
+                <button name='complete'
+                        onClick={handleCompleteButton}>Mark as Complete</button>
               </li>
             </ul>  
           </fieldset>  
