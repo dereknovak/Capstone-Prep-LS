@@ -1,13 +1,11 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import type { Todo, TodoListTools } from "../types";
-import { openModal } from "../utilities/shared";
+import { formatDate, openModal } from "../utilities/shared";
 
-const Todo: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
-  const [checked, setChecked] = useState(false);
-  const { id, title, day, month, year, completed, description } = todo;
+const Todo: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checked, setChecked }) => {
+  const { id, title, month, year, completed } = todo;
 
-  const formatDate = () => (!month || !year) ? 'No Due Date' : `${month}/${year}`;
-  const fullDate = formatDate();
+  const fullDate = formatDate(month, year);
 
   const toggleComplete = () => {
     const newStatus = !completed;
@@ -34,6 +32,13 @@ const Todo: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
     setTodo(todo);
   };
 
+  const deleteTodo = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+
+    const todosCopy = todos.filter(todoCopy => todo.id !== todoCopy.id);
+    setTodos(todosCopy);
+  };
+
   return (
     <tr onClick={toggleComplete}>
       <td className='list_item'>
@@ -43,7 +48,7 @@ const Todo: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
         <span className='check'></span>
         <label onClick={reviseTodo} >{title} - {fullDate}</label>
       </td>
-      <td className='delete'>
+      <td className='delete' onClick={deleteTodo}>
         <img src='src/assets/images/trash.png' alt='Delete' />
       </td>
     </tr>

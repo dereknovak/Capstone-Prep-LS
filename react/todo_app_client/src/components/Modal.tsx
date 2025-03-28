@@ -2,7 +2,7 @@ import { ChangeEvent } from 'react';
 import type { FormElement, Todo, TodoListTools } from '../types';
 import { closeModal, emptyTodo } from '../utilities/shared';
 
-const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
+const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checked, setChecked, group, setGroup }) => {
   const addToList = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTodos(todos.concat({
@@ -27,8 +27,24 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
     return Math.max(...todos.map((todo: Todo) => todo.id)) + 1 || 0
   };
 
-  const handleCompleteButton = () => {
-    // Working on implementing a way to check if Modal form is new for Complete button
+  const handleCompleteButton = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (!todo.id) {
+      alert('Cannot mark a new todo as complete.')
+    } else if (todo.completed) {
+      alert('Todo has already been completed.')
+    } else {
+      const todosCopy = todos.map(todoCopy => 
+        todo.id === todoCopy.id ? { ...todoCopy, completed: true } : todoCopy
+      );
+  
+      todosCopy.sort((a, b) => a.id - b.id);
+      todosCopy.sort((a, b) => Number(a.completed) - Number(b.completed));
+  
+      setChecked(checked);
+      setTodos(todosCopy);
+    }
   };
 
   return (

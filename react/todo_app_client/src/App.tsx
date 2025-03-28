@@ -4,13 +4,17 @@ import axios from 'axios';
 
 import Modal from './components/Modal';
 import List from './components/List';
+import SideBar from './components/SideBar';
+
 import { emptyTodo } from './utilities/shared';
-import type { Todo, TodoList, TodoListTools } from './types';
+import type { Todo, TodoListTools } from './types';
 
 const baseURL = 'http://localhost:3000/api';
 
+// Specify group type using keyof
 const App = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [group, setGroup] = useState('');
   const [todo, setTodo] = useState<Todo>(emptyTodo);
 
   const fetchTodos = async () => {
@@ -25,55 +29,39 @@ const App = () => {
   return (
     <>
       <input type='checkbox' id='sidebar_toggle' />
-      <SideBar todos={todos} />
+      <SideBar todos={todos}
+               group={group}
+               setGroup={setGroup} />
       <Items todos={todos}
              setTodos={setTodos}
              todo={todo}
-             setTodo={setTodo} />
+             setTodo={setTodo}
+             group={group}
+             setGroup={setGroup} />
     </>
   )
 };
 
-const SideBar: React.FC<{ todos: TodoList }> = ({ todos }) => {
-  return (
-    <div id='sidebar'>
-      <section id='all'>
-        <div id='all_todos'>
-          <header id='all_header' className='active'>
-            <dl>
-              <dt>All Todos</dt>
-              <dd>{todos.length}</dd>
-            </dl>
-          </header>
-        </div>
-        <article id='all_lists'></article>
-      </section>
-      <section className='completed' id='completed_items'>
-        <div id='completed_todos'>
-          <header id='all_done_header'>
-            <dl>
-              <dt>Completed</dt>
-              <dd>0</dd>
-            </dl>
-          </header>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-const Items: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo }) => {
+const Items: React.FC<Omit<TodoListTools, 'checked' | 'setChecked'>> = ({ todos, setTodos, todo, setTodo, group, setGroup }) => {
+  const [checked, setChecked] = useState(false);
   return (
     <div id='items'>
       <main>
         <Modal todos={todos}
                setTodos={setTodos}
                todo={todo}
-               setTodo={setTodo} />
+               setTodo={setTodo}
+               checked={checked}
+               setChecked={setChecked}
+               group={group}
+               setGroup={setGroup} />
         <List todos={todos}
               setTodos={setTodos}
-              todo={todo}
-              setTodo={setTodo} />
+              setTodo={setTodo}
+              checked={checked}
+              setChecked={setChecked}
+              group={group}
+              setGroup={setGroup}/>
       </main>
     </div>
   );

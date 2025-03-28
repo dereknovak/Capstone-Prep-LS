@@ -10,6 +10,11 @@ export const emptyTodo: Todo = {
   description: '',
 };
 
+// Fix undefined type requirement
+export const formatDate = (month: string | undefined, year: string | undefined) => {
+  return (!month || !year) ? 'No Due Date' : `${month}/${year}`;
+};
+
 export const openModal = () => {
   const modalForm = document.getElementById('form_modal') as HTMLElement;
   const modalLayer = document.getElementById('modal_layer') as HTMLElement;
