@@ -14,7 +14,7 @@ const baseURL = 'http://localhost:3000/api';
 // Specify group type using keyof
 const App = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [group, setGroup] = useState('');
+  const [group, setGroup] = useState('All Todos');
   const [todo, setTodo] = useState<Todo>(emptyTodo);
 
   const fetchTodos = async () => {

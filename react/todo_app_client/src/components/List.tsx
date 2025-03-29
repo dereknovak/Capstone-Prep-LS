@@ -9,12 +9,14 @@ const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo,
   };
 
   const currentGroup = () => {
-    if (group) {
+    if (group === 'All Todos') {
+      return todos;
+    } else if (group === 'Completed') {
+      return todos.filter(todo => todo.completed);
+    } else {
       return todos.filter(todo => {
         return formatDate(todo.month, todo.year) === group;
       });
-    } else {
-      return todos;
     }
   };
 
@@ -22,8 +24,8 @@ const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo,
     <>
       <header>
         <dl>
-          <dt>{group || 'All Todos'}</dt>
-          <dd>{todos.length}</dd>
+          <dt>{group}</dt>
+          <dd>{todos.length}</dd> // FIX THIS
         </dl>
       </header>
       <label onClick={addNewTodo}>
