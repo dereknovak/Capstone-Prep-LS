@@ -1,11 +1,20 @@
 import type { TodoListTools } from "../types";
-import { emptyTodo, formatDate, openModal } from "../utilities/shared";
+import { deactivateAllTabs, emptyTodo, formatDate, openModal } from "../utilities/shared";
 import Todo from "./Todo";
 
 const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo, checked, setChecked, group, setGroup }) => {
   const addNewTodo = () => {
     openModal();
     setTodo(emptyTodo);
+    loadAllTodos();
+  };
+
+  const loadAllTodos = () => {
+    setGroup('All Todos');
+    deactivateAllTabs();
+
+    const allTodosHeader = document.getElementById('all_header') as HTMLElement;
+    allTodosHeader.classList.add('active');
   };
 
   const currentGroup = () => {
@@ -13,6 +22,11 @@ const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo,
       return todos;
     } else if (group === 'Completed') {
       return todos.filter(todo => todo.completed);
+    } else if (group.includes('Completed')) {
+      return todos.filter(todo => {
+        const groupDate = group.replace(/ \(Completed\)/, '');
+        return formatDate(todo.month, todo.year) === groupDate;
+      }).filter(todo => todo.completed);
     } else {
       return todos.filter(todo => {
         return formatDate(todo.month, todo.year) === group;
@@ -25,7 +39,7 @@ const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo,
       <header>
         <dl>
           <dt>{group}</dt>
-          <dd>{todos.length}</dd> // FIX THIS
+          <dd>{currentGroup().length}</dd>
         </dl>
       </header>
       <label onClick={addNewTodo}>
@@ -52,3 +66,13 @@ const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo,
 };
 
 export default List;
+
+/* 
+Should have finished all functionality
+Need to go through and check edge cases
+Validation?
+Fix all TS errors
+Refactor Code
+Change on API?
+*/
+

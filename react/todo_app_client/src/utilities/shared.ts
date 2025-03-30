@@ -30,3 +30,16 @@ export const closeModal = () => {
   modalForm.style.display = 'none';
   modalLayer.style.display = 'none';
 };
+
+export const deactivateAllTabs = () => {
+  const sidebarGroups = document.querySelectorAll('dl');
+  for (const tab of sidebarGroups) {
+    tab.classList.remove('active');
+  }
+
+  const allTodosHeader = document.getElementById('all_header') as HTMLElement;
+  allTodosHeader.classList.remove('active');
+
+  const allDoneHeader = document.getElementById('all_done_header') as HTMLElement;
+  allDoneHeader.classList.remove('active');
+};

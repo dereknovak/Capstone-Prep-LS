@@ -22,3 +22,5 @@ export interface TodoListTools {
 }
 
 export type FormElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+export type Group = [string, TodoList];

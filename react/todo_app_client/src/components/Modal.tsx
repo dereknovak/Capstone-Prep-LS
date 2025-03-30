@@ -5,10 +5,24 @@ import { closeModal, emptyTodo } from '../utilities/shared';
 const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checked, setChecked, group, setGroup }) => {
   const addToList = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setTodos(todos.concat({
-      ...todo,
-      id: generateId(),
-    }));
+
+    //Rename expression
+    if (todo.id === 0) {
+      setTodos(todos.concat({
+        ...todo,
+        id: generateId(),
+      }));
+    } else {
+      const todosCopy = todos.map(todoCopy => {
+        if (todoCopy.id === todo.id) {
+          return { ...todo };
+        } else {
+          return todoCopy;
+        }
+      });
+
+      setTodos(todosCopy);
+    }
 
     setTodo(emptyTodo);
     closeModal();
@@ -72,7 +86,7 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checke
                           name='day'
                           value={todo.day}
                           onChange={updateText}>
-                    <option>Day</option>
+                    <option value=''>Day</option>
                     <option value='01'>1</option>
                     <option value='02'>2</option>
                     <option value='03'>3</option>
@@ -109,7 +123,7 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checke
                           name='month'
                           value={todo.month}
                           onChange={updateText}>
-                    <option>Month</option>
+                    <option value=''>Month</option>
                     <option value='01'>January</option>
                     <option value='02'>February</option>
                     <option value='03'>March</option>
@@ -127,7 +141,7 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checke
                           name='year'
                           value={todo.year}
                           onChange={updateText}>
-                    <option>Year</option>
+                    <option value=''>Year</option>
                     <option>2014</option>
                     <option>2015</option>
                     <option>2016</option>

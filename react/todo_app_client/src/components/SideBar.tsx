@@ -1,7 +1,7 @@
-import { formatDate } from "../utilities/shared";
-import type { Todo, TodoList, TodoListTools } from "../types";
+import { deactivateAllTabs, formatDate } from "../utilities/shared";
+import type { Group, Todo, TodoList, TodoListTools } from "../types";
 
-import Group from "./Group";
+import Tab from "./Tab";
 
 const SideBar: React.FC<TodoListTools> = ({ todos, group, setGroup }) => {
   const groupByDate = (completedList = false) => {
@@ -17,12 +17,30 @@ const SideBar: React.FC<TodoListTools> = ({ todos, group, setGroup }) => {
       }
     });
 
-    return groups;
+    return sortGroups(Object.entries(groups));
+  };
+
+  const sortGroups = (groups: Group[]) => {
+    const noDueDate = groups.filter(([name, _]) => name === 'No Due Date');
+    const dates = groups.filter(([name, _]) => name !== 'No Due Date');
+
+    dates.sort((a: Group, b: Group) => {
+      const dateA = new Date(Number(a[0].slice(3)), Number(a[0].slice(0, 2)) - 1);
+      const dateB = new Date(Number(b[0].slice(3)), Number(b[0].slice(0, 2)) - 1);
+
+      return dateA.getTime() - dateB.getTime();
+    });
+
+    return noDueDate.concat(dates);
   };
 
   // Change to keyof
-  const loadGroup = (currentTarget: HTMLDListElement, name: string) => {
-    setGroup(name);
+  const loadGroup = (currentTarget: HTMLDListElement, name: string, listType: 'all' | 'completed') => {
+    if (listType === 'completed') {
+      setGroup(`${name} (Completed)`);
+    } else {
+      setGroup(name);
+    }
 
     const allTodosHeader = document.getElementById('all_header') as HTMLElement;
     allTodosHeader.classList.remove('active');
@@ -52,19 +70,6 @@ const SideBar: React.FC<TodoListTools> = ({ todos, group, setGroup }) => {
     return todos.filter(todo => todo.completed);
   };
 
-  const deactivateAllTabs = () => {
-    const sidebarGroups = document.querySelectorAll('dl');
-    for (const tab of sidebarGroups) {
-      tab.classList.remove('active');
-    }
-
-    const allTodosHeader = document.getElementById('all_header') as HTMLElement;
-    allTodosHeader.classList.remove('active');
-
-    const allDoneHeader = document.getElementById('all_done_header') as HTMLElement;
-    allDoneHeader.classList.remove('active');
-  };
-
   return (
     <div id='sidebar'>
       <section id='all'>
@@ -78,13 +83,13 @@ const SideBar: React.FC<TodoListTools> = ({ todos, group, setGroup }) => {
         </div>
         <article id='all_lists'>
           {
-            Object.entries(groupByDate()).map(([name, contents], idx) =>
-              <Group key={idx}
-                     name={name}
-                     contents={contents}
-                     group={group}
-                     loadGroup={loadGroup}
-                     listType={'all'}
+            groupByDate().map(([name, contents], idx) =>
+              <Tab key={idx}
+                   name={name}
+                   contents={contents}
+                   group={group}
+                   loadGroup={loadGroup}
+                   listType={'all'}
               />
             )
           } 
@@ -102,13 +107,13 @@ const SideBar: React.FC<TodoListTools> = ({ todos, group, setGroup }) => {
         </div>
         <article id='completed_lists'>
           {
-            Object.entries(groupByDate(true)).map(([name, contents], idx) =>
-              <Group key={idx}
-                     name={name}
-                     contents={contents}
-                     group={group}
-                     loadGroup={loadGroup}
-                     listType={'completed'}
+            groupByDate(true).map(([name, contents], idx) =>
+              <Tab key={idx}
+                   name={name}
+                   contents={contents}
+                   group={group}
+                   loadGroup={loadGroup}
+                   listType={'completed'}
               />
             )
           }
