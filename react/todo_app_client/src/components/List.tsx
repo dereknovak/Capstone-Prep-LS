@@ -1,8 +1,8 @@
-import type { TodoListTools } from "../types";
+import type { ListTools } from "../types";
 import { deactivateAllTabs, emptyTodo, formatDate, openModal } from "../utilities/shared";
 import Todo from "./Todo";
 
-const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo, checked, setChecked, group, setGroup }) => {
+const List: React.FC<ListTools> = ({ todos, setTodos, setTodo, checked, setChecked, tab, setTab }) => {
   const addNewTodo = () => {
     openModal();
     setTodo(emptyTodo);
@@ -10,7 +10,7 @@ const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo,
   };
 
   const loadAllTodos = () => {
-    setGroup('All Todos');
+    setTab('All Todos');
     deactivateAllTabs();
 
     const allTodosHeader = document.getElementById('all_header') as HTMLElement;
@@ -18,18 +18,18 @@ const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo,
   };
 
   const currentGroup = () => {
-    if (group === 'All Todos') {
+    if (tab === 'All Todos') {
       return todos;
-    } else if (group === 'Completed') {
+    } else if (tab === 'Completed') {
       return todos.filter(todo => todo.completed);
-    } else if (group.includes('Completed')) {
+    } else if (tab.includes('Completed')) {
       return todos.filter(todo => {
-        const groupDate = group.replace(/ \(Completed\)/, '');
+        const groupDate = tab.replace(/ \(Completed\)/, '');
         return formatDate(todo.month, todo.year) === groupDate;
       }).filter(todo => todo.completed);
     } else {
       return todos.filter(todo => {
-        return formatDate(todo.month, todo.year) === group;
+        return formatDate(todo.month, todo.year) === tab;
       });
     }
   };
@@ -38,7 +38,7 @@ const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo,
     <>
       <header>
         <dl>
-          <dt>{group}</dt>
+          <dt>{tab}</dt>
           <dd>{currentGroup().length}</dd>
         </dl>
       </header>
@@ -66,13 +66,3 @@ const List: React.FC<Omit<TodoListTools, 'todo'>> = ({ todos, setTodos, setTodo,
 };
 
 export default List;
-
-/* 
-Should have finished all functionality
-Need to go through and check edge cases
-Validation?
-Fix all TS errors
-Refactor Code
-Change on API?
-*/
-

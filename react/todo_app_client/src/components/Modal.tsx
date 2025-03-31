@@ -1,17 +1,19 @@
 import { ChangeEvent } from 'react';
-import type { FormElement, Todo, TodoListTools } from '../types';
+import type { FormElement, ModalTools, Todo, TodoList } from '../types';
 import { closeModal, emptyTodo } from '../utilities/shared';
 
-const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checked, setChecked, group, setGroup }) => {
+const Modal: React.FC<ModalTools> = ({ todos, setTodos, todo, setTodo, checked, setChecked }) => {
   const addToList = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    //Rename expression
-    if (todo.id === 0) {
-      setTodos(todos.concat({
+    if (!todo.id) {
+      const todosCopy = todos.concat({
         ...todo,
         id: generateId(),
-      }));
+      });
+
+      sortList(todosCopy);
+      setTodos(todosCopy);
     } else {
       const todosCopy = todos.map(todoCopy => {
         if (todoCopy.id === todo.id) {
@@ -37,6 +39,11 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checke
     });
   }
 
+  const sortList = (todos: TodoList) => {
+    todos.sort((a, b) => a.id - b.id);
+    todos.sort((a, b) => Number(a.completed) - Number(b.completed));
+  };
+
   const generateId = () => {
     return Math.max(...todos.map((todo: Todo) => todo.id)) + 1 || 0
   };
@@ -53,8 +60,7 @@ const Modal: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checke
         todo.id === todoCopy.id ? { ...todoCopy, completed: true } : todoCopy
       );
   
-      todosCopy.sort((a, b) => a.id - b.id);
-      todosCopy.sort((a, b) => Number(a.completed) - Number(b.completed));
+      sortList(todosCopy);
   
       setChecked(checked);
       setTodos(todosCopy);

@@ -234,7 +234,7 @@ table .list_item .check {
 }
 
 table td input[type="checkbox"]:checked + .check {
-    background-image: url(".assets/images/checked.png");
+    background-image: url("./assets/images/checked.png");
 }
 .delete img:hover{
   cursor: pointer;
@@ -361,4 +361,9 @@ input[type="checkbox"] + section {
     display: block;
   }
 
+}
+
+.modal.show {
+  opacity: 1;
+  visibility: visible;
 }

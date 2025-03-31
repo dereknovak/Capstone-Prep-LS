@@ -1,8 +1,8 @@
 import { ChangeEvent } from "react";
-import type { Todo, TodoListTools } from "../types";
+import type { Todo, TodoTools } from "../types";
 import { formatDate, openModal } from "../utilities/shared";
 
-const Todo: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checked, setChecked }) => {
+const Todo: React.FC<TodoTools> = ({ todos, setTodos, todo, setTodo, checked, setChecked }) => {
   const { id, title, month, year, completed } = todo;
 
   const fullDate = formatDate(month, year);
@@ -56,5 +56,3 @@ const Todo: React.FC<TodoListTools> = ({ todos, setTodos, todo, setTodo, checked
 };
 
 export default Todo;
-
-// Checkbox vanishes when clicked
