@@ -246,3 +246,129 @@ AWS Notes
     - 80 => HTTP
     - 443 => HTTPS
     - 3389 => RDP (remote desktop protocol - Windows instance)
+
+## SSH
+
+- Can be used on Mac, Linux, and Windows >= 10
+    - Windows < 10 => PuTTY
+
+## SSH with Linux/MacOSX
+
+- SSH allows you to control a remote machine using the command line
+
+- To access the instance from terminal
+    - `ssh -i KEY.pem ec2-user@PUBLIC_IP`
+
+- If permissions are rejected, change permissions for the `.pem`. file
+    - `chmod 0400 KEY.pem`
+
+## IAM Roles
+
+- NEVER enter your personal info into `aws configure`, as anyone will be able to access your instance
+    - Instead, use IAM Roles
+
+## Purchasing Options
+
+- EC2 On Demand
+    - Recommended for short-term and un-interupted workload
+    - **Come whenever and pay full price
+- Reserved Instances
+    - Recommended for steady-state usage applications (databases)
+    - Can only reserve for 1 or 3 years
+    - **Plan ahead and get a discount
+- Savings Plans
+    - **Pay x amount per hour to stay in any room
+- Spot Instances
+    - Can lose instance at any time
+    - Useful for workloads that are resilient to failure
+    - Not suitable for critical jobs or databases
+    - **Bid for rooms to stay in and highest bidder keeps room. Can be kicked out whenever
+- Dedicated Hosts
+    - Allows you address compliance requirements and use your existing server-bound software licenses
+    - **Book entire building
+- Dedicated Instances
+    - You have your own instance on your own hardware
+- Capacity Reservations
+    - Suitable for short-term, uninterupted workloads that needs to be in a specific AZ
+    - **Book room even if you don't stay in, but you can come and go as you please
+
+** Resort analogy
+
+## Spot Fleet
+
+- Spot Fleet is a set of Spot Instances and optionally On-Demand Instances. It allows you to automatically request Spot Instances with the lowest price.
+
+# IP
+
+## Public vs Private IP
+
+- Public
+    - Public IPs can be identified on the internet
+    - Must always be unique (no 2 machines can share the same IP)
+    - Geo-location can be easily found
+- Private
+    - Private IPs can only be identified on a private network
+    - IP must be unique across the private network
+        - 2 different companies can have the same private IP
+    - Machines connect to the internet via internet gateway (proxy)
+    - Only certain range of IPs can be used as a private IP
+- Elastic IP
+    - Starting/Stopping instance will change its public IP
+    - If you need a fixed public IP, you need an Elastic IP
+    - Can be attached to one instance at a time
+    - Can only have 5 Elastic IPs on AWS
+        - Try to avoid using them
+
+## Placement Groups
+
+- Provides control over where the EC2 instance to be placed within AWS
+- Strategies
+    - Cluster - clusters isntances into a low-latency group
+        - high performance, high risk
+    - Spread - Spreads instance across underlying hardware
+    - Partition - Spead instances across different partitions
+
+### Cluster
+
+- All instances are in the same AZ
+- Pros
+    - Great network
+Cons
+    - If AZ fails, all instances will fail
+- Uses
+    - Big data job that needs to be completed fast
+    - Application that needs extremely low latency and high network
+
+### Spread
+
+- All instances are located on different hardware
+- Pros
+    - Can span across AZs
+    - Reduced risk of simultaneous failure
+- Cons
+    - Limited to 7 instances per AZ
+- Uses
+    - Applications that need to maximize high availability
+    - Critical Applications where instances must be isolated from failure from each other
+
+### Partition
+
+- Up to 7 partitions per AZ
+- Can span across multiple AZ in same region
+- Up to 100s of EC2 Instances
+- Partition can affect many EC2 Instance but not other partitions
+- Use Cases
+    - Big Data applications
+        - HDFS, HBase, etc...
+
+## ENI (Elastic Network Interfaces)
+
+- Logical component in a VPC that represents a Virtual Network Card
+- Following Attributes
+    - Primary Private IPv4, 1 or more secondary IPv4
+    - One Elastic IP per private IPv4
+    - One or more Security Groups
+    - MAC address
+- Can create ENIs on the fly and move to EC2 Instances
+- Bound to a specific AZ
+- ENIs give us more control over your network interfaces as they are not deleted upon termination of a EC2 Instance
