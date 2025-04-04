@@ -372,3 +372,59 @@ Cons
 - Can create ENIs on the fly and move to EC2 Instances
 - Bound to a specific AZ
 - ENIs give us more control over your network interfaces as they are not deleted upon termination of a EC2 Instance
+
+## EC2 Hibernate
+
+- When stopping:
+    - Stop: Data on disk is kept intact
+    - Terminate: Any EBS volumes also set-up to be destroyed is lost
+
+- Upon starting again
+    - OS boots and EC2 User Data script is run
+    - OS boots up
+    - Application starts, caches warm up, takes time
+
+- Hibernate
+    - In-memory state is preserved
+        - Instance boot is much faster
+    - The RAM is written to a file in the root EBS volume
+    - The root EBS volume must be encrypted
+- Use cases
+    - Long running processes
+    - Saving RAM state
+    - Services that take time to initialize
+
+# Instance Storage
+
+## EBS
+
+- EBS Volume
+    - Elastic Block Store: A network drive you can attach to your instances while they run
+        - Uses the network to communicate the instances, may be latency
+        - Can be detached from a EC2 instance and attached to another quickly
+    - Allows instances to persist data, even after termination
+    - Bound to specific AZ
+    - Think of it as a network USB stick
+    - Have a provisioned capacity, in GBs, not IOPS
+        - Can increase capacity over time
+    - EBS volume can only be attached to 1 instance
+        - Multiple EBS volumes can be attached to an instance
+
+## Snapshot
+
+- A backup (snapshot) of your EBS volume
+- Not necessary when detaching a volume, but recommended
+- Can copy snapshots acoss AZ or region
+
+### Features
+
+- Snapshot Archive
+    - Move Snapshot to an 'archive tier' that is 75% cheaper
+    - Takes within 24-72 hours
+- Recycle Bin for Snapshots
+    - Can recover after accidental deleting
+    - Specify retention (1 day => 1 year)
+- Fast Snapshot Restore (FSR)
+    - Force full initialization of snapshot to have no latency on first use
+    - Expensive
+
