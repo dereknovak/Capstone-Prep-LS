@@ -1,6 +1,7 @@
 import { ChangeEvent } from 'react';
-import type { FormElement, ModalTools, Todo, TodoList } from '../types';
-import { closeModal, emptyTodo } from '../utilities/shared';
+import type { FormElement, ModalTools, Todo } from '../types';
+import { closeModal, emptyTodo, sortList } from '../utilities/shared';
+import { create, update } from '../utilities/services';
 
 const Modal: React.FC<ModalTools> = ({ todos, setTodos, todo, setTodo, checked, setChecked }) => {
   const addToList = (e: React.FormEvent<HTMLFormElement>) => {
@@ -12,6 +13,7 @@ const Modal: React.FC<ModalTools> = ({ todos, setTodos, todo, setTodo, checked, 
         id: generateId(),
       });
 
+      create(todo);
       sortList(todosCopy);
       setTodos(todosCopy);
     } else {
@@ -23,6 +25,7 @@ const Modal: React.FC<ModalTools> = ({ todos, setTodos, todo, setTodo, checked, 
         }
       });
 
+      update(todo.id, todo)
       setTodos(todosCopy);
     }
 
@@ -38,11 +41,6 @@ const Modal: React.FC<ModalTools> = ({ todos, setTodos, todo, setTodo, checked, 
       [target.name]: target.value,
     });
   }
-
-  const sortList = (todos: TodoList) => {
-    todos.sort((a, b) => a.id - b.id);
-    todos.sort((a, b) => Number(a.completed) - Number(b.completed));
-  };
 
   const generateId = () => {
     return Math.max(...todos.map((todo: Todo) => todo.id)) + 1 || 0

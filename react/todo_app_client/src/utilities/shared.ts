@@ -1,4 +1,4 @@
-import type { Todo } from "../types";
+import type { Todo, TodoList } from "../types";
 
 export const emptyTodo: Todo = {
   id: 0,
@@ -42,4 +42,9 @@ export const deactivateAllTabs = () => {
 
   const allDoneHeader = document.getElementById('all_done_header') as HTMLElement;
   allDoneHeader.classList.remove('active');
+};
+
+export const sortList = (todos: TodoList) => {
+  todos.sort((a, b) => a.id - b.id);
+  todos.sort((a, b) => Number(a.completed) - Number(b.completed));
 };

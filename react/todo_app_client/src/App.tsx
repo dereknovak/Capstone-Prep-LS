@@ -5,7 +5,7 @@ import axios from 'axios';
 import Main from './components/Main';
 import Nav from './components/Nav';
 
-import { emptyTodo } from './utilities/shared';
+import { sortList, emptyTodo } from './utilities/shared';
 import type { Tab, Todo } from './types';
 
 const baseURL = 'http://localhost:3000/api';
@@ -17,7 +17,10 @@ const App = () => {
 
   const fetchTodos = async () => {
     const response = await axios.get(`${baseURL}/todos`);
-    setTodos(response.data);
+    const retrievedTodos = response.data;
+    sortList(retrievedTodos);
+
+    setTodos(retrievedTodos);
   }
 
   useEffect(() => {
@@ -40,5 +43,3 @@ const App = () => {
 };
 
 export default App
-
-// Just need to make changes to server upon each request
