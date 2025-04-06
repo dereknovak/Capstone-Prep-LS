@@ -428,3 +428,173 @@ Cons
     - Force full initialization of snapshot to have no latency on first use
     - Expensive
 
+## AMI
+
+- Amazon Machine Image
+- Powers Instances
+- A customization of an EC2 instance
+- Built for a specific region (can be copied across AZs)
+- Can launch EC2 instances from:
+    - A public AMI (AWS provided)
+    - Your own AMI (maintain yourself)
+    - AWS marketplace AMI (made by someone else)
+
+### Process
+
+- Start an EC2 instance and customize it
+- Stop the instance (for data integrity)
+- Build an AMI
+    - This also creates EBS snapshots
+- Launch instances from other AMIs
+    - Launches much quicker than a traditional instance
+
+## Instance Store
+
+- EBS Volumes are network drives with good but 'limited' performance
+- EC2 Instance Store provides *high-performance hardware disk*
+
+- Better I/O performance
+- If you stop/terminate instance, data will be lost (ephemeral)
+- Good for:
+    - buffer
+    - cache 
+    - scratch data
+    - temporary content
+- EBS is better for long-term storage
+- Risk of data loss if hardware fails
+- Backups and Replication are your responsibility
+
+## EBS Volume Types
+
+- 6 different types:
+    - gp2 / gp3 (SSD)
+        - General purpose balance price/performance
+    - io1 / io2 Block Express (SSD)
+        - Highest performance for mission critical low latency
+    - st1 (HDD)
+        - Low cost HDD
+    - sc1 (HDD)
+        - Lowest cost HDD volume designed for less frequency
+- EBS Volumes are characterized in Size, Throughput, IOPS (I/O Ops/sec)
+- Only gp2/gp3 and io1/io2 Block Express can be used as boot volumes
+
+### General Purpose SSD
+
+- Cost effective storage, low latency
+- gp3 can independently set the IOPS and the throughputs
+    - gp2, they are linked together
+
+### Provisioned IOPS
+
+- io1/io2 Block Express
+- Use cases:
+    - Critical business applications with sustained IOPS performance
+    - Great for databases workloads (sensitive to storage perforamance and consistency)
+    - Supports EBS Multi-attach
+
+### Hard Disk Drives (HDD)
+
+- Cannot be a boot volume
+- Throughput Optimized HDD (st1)
+- Cold HDD (sc1)
+    - Scenarios where lowest cost is important
+
+## EBS Multi-Attach
+
+- Only available for io1/io2
+- Attach the same EBS volume to multiple EC2 instances in the same AZ
+- Each instance has full r/w permissions to the high-performance volume
+- Use Cases:
+    - Achieve higher application availability in clustered Linux applications
+    - Applications must manage concurrent write operations
+- Up to 16 EC2 instances at a time
+- Must use a file system that is cluster-aware.
+
+## EBS Encryption
+
+- When you encrypt a volume:
+    - Data at rest is encrypted
+    - All data in flight is encrypted
+    - All snapshots are encrypted
+    - All volumes created from snapshot are encrypted
+- Encryption and Decryption are done transparently (you do nothing)
+- Encryption has minimal impact on latency
+- Leverages keys from KMS
+- Copying an unencrypted snapshot allows encryption
+- Snapshots of encrypted volumes are encrypted
+
+### Encrypt an unencrypted EBS volume
+
+1. Create EBS snapshot of volume
+2. Encrypt the EBS snapshot (using copy)
+3. Create new EBS volume from snapshot (volume will also be encrypted)
+4. Attach encrypted volume to original instance
+
+## Amazon EFS
+///// REVISIT HANDS ON //////
+
+- Elastic File System
+- Managed NFS (network file system) that can be mounted on many EC2
+- EFS works with EC2 instances in multi-AZ
+- Highly available, scalable, expensive (3x gp2), pay per use
+
+- Use Cases
+    - Content Management
+    - Web serving
+    - data sharing
+    - Wordpress
+- Uses NFSv4.1 protocol
+- Uses security group to control access to EFS
+- Compatible with Linux based AMI (not Windows)
+- Encryption at rest using KMS
+
+- POSIX file system (~Linux) that has a stanard file API
+- File system scales automatically
+    - pay-per-use
+    - no capacity planning
+
+### Performance
+
+- EFS Scale
+- Performance Mode (set at EFS creation time)
+    - General Purpose (default)
+    - Max I/O
+- Throughput Mode
+    - Bursting
+    - Provisioned
+    - Elastic
+
+### Storage Classes
+
+- Storage Tiers
+    - Standard
+    - Infrequent Access (EFS-IA)
+    - Archive (rare access)
+    - Implement *lifecycle policies* to move between tiers
+
+- Availability and Durability
+    - Standard
+    - One Zone
+
+- Using the right storage classes, you can save up to 90%.
+
+## EBS vs EFS
+
+- EBS volumes:
+    - One instance (except multi-attach io1/io2)
+    - Locked at the AZ level
+    - gp2: IO increases if disk size increases
+    - gp3 and io1: can increase IO independently
+    - To migrate an EBS volume across AZ:
+        - Take a snapshot
+        - Restore the snapshot to another AZ
+        - EBS backups use IO and you shouldn't run them while your app is handling lots of traffic
+    - Root EBS volumes of instances get terminated by default if the EC2 instance gets terminated
+- EFS
+    - Mounting 100s of instances across AZs
+    - EFS share website files (WordPress)
+    - Only for Linux Instances (POSIX)
+    - Higher price
+    - Can leverage Storage Tiers for cost savings
+
+- EFS vs EBS vs Instance Store
