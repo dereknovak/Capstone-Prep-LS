@@ -1,6 +1,6 @@
 AWS Notes
 
-# IAM
+# IAM ************************************************
 
 - IAM => Identity and Access Management, Global Service
 
@@ -131,7 +131,7 @@ AWS Notes
 - Access Keys: Access AWS using ^^^
 - Audit: Credentials Reports and Last Accessed
 
-# Budget
+# Budget *********************************************
 
 # EC2
 
@@ -298,7 +298,7 @@ AWS Notes
 
 - Spot Fleet is a set of Spot Instances and optionally On-Demand Instances. It allows you to automatically request Spot Instances with the lowest price.
 
-# IP
+# IP *************************************************
 
 ## Public vs Private IP
 
@@ -394,7 +394,7 @@ Cons
     - Saving RAM state
     - Services that take time to initialize
 
-# Instance Storage
+# Instance Storage ***********************************
 
 ## EBS
 
@@ -599,7 +599,7 @@ Cons
 
 - EFS vs EBS vs Instance Store
 
-# High Availability and Scalability
+# High Availability and Scalability ******************
 
 ## Vertical Scaling
 
