@@ -753,3 +753,234 @@ Cons
 - NLB and GLB
     - Disabled by default
     - You pay charges for inter AZ data if enabled
+
+## SSL/TLS
+
+- Load Balancer handles the SSL Certificate
+- Manage SSL Certificates using AWS Certificate Manager (ACM)
+- You can upload your own certificates
+
+### SNI
+
+- Server Name Indiciation
+- Allows you to load multiple SSL Certificates onto one web server
+- Requires the client to *indicate* the hostname of the target server in the initial SSL handshake
+    - The server will then find the correct certificate or return a default one
+
+- Only works for ALB and NLB
+- Does not work for CLB
+
+## Connection Draining
+
+- Name Differences:
+    - Connection Draining - CLB
+    - Deregistration Delay - ALB and NLB
+- Time to complete 'in-flight requests' while the instance is de-registering or unhealthy
+- Stops sending new requests to the EC2 instance which is de-registering
+- Can be set between 1-3600 seconds
+    - Default = 300
+- Can be disabled (0)
+- Set to a low value if your requests are short
+
+## Auto Scaling Group
+
+- Load on your websites and applications can change quickly
+- In cloud, you can/remove servers very quickly
+
+- Goal of ASG:
+    - Scale out (add EC2 instances) to match an increased load
+    - Scale in (remove EC2 instances) to match decreased load
+    - Ensure we have a min and max number of EC2 instance running
+    - Automatiicaly register new instances to a load balancer
+    - Re-create an EC2 instance to replace an unhealthy one
+
+Set Capacities:
+    - Min
+    - Desired
+    - Max
+    - Scale in and out as needed
+
+### Attributes
+
+- A *Launch Template*
+    - AMI + Instance Type
+    - EC2 User Data
+    - EBS Volumes
+    - Security Groups
+    - SSH Key Pair
+    - IAM Roles for your EC2 instances
+    - Network + Subnet Information
+    - Load Balancer Information
+- Min Size / Max Size / Initial Capactity (must define)
+- Scaling Policies
+
+### Auto Scaling
+
+- Scale an ASG using CloudWatch alarms
+    - Alarms monitor metrics (Average CPU, custom metric)
+- Based on alarm
+    - Create scale-out policies
+    - Create scale-in policies
+
+### Auto Scaling Policies
+
+- Dynamic Scaling
+    - Target Tracking Scaling
+        - Simple set-up
+    - Simple / Step Scaling
+- Scheduled Scaling
+    - Anticipate a scaling based on known usage patterns
+- Predictive Scaling
+    - Continuously forecast load and schedule scaling ahead
+
+- Metrics to Scale on
+    - CPUUtilization
+    - RequestCountPerTarget
+    - Average Network In/Out
+    - Any Custom Metric
+
+### Cooldown
+
+- After scaling activity, you enter cooldown period
+- ASG will not launch or terminate additional instances
+    - Allows metrics to stabilize
+
+# RDS ************************************************
+
+- Relational Database Service
+- Managed DB service for DB use SQL as a query language
+- Allows you to create databases in cloud that are managed by AWS
+    - Postgres
+    - MySQL
+    - MariaDB
+    - Oracle
+    - Microsoft SQL Server
+    - IBM DB2
+    - Aurora (AWS Proprietary DB)
+
+- Why use RDS?
+    - A managed service
+        - Automated provisioning, OS patching
+        - Continuous backups and restore to specific timestamp
+        - Monitoring dashboards
+        - Read replicas for improved read performance
+        - Multi AZ setup for Disaster Recovery (DR)
+        - Maintenance windows for upgrades
+        - Scaling capability (vertical/horizontal)
+        - Storage backend by EBS
+    - BUT...you CANNOT SSH into your instances
+
+## Storage Auto Scaling
+
+- Helps you increase storage on your RDS DB instance dynamically
+- RDS scales automatically when it detects you are running out of free DB storage
+- Avoid manually scaling your DB storage
+
+- Set a Maximum Storage Threshold
+- Automatically modify storage if:
+    - Free storage < 10% allocated storage
+    - Low-storage lasts at least 5 mins
+    - 6 hours have passed since last modification
+
+- RDS is useful for applications with unpredicatable workloads
+- Supports all RDS database engines
+
+## Read Replicas
+
+- Help you scale your reads
+- If an outside client wants to run reports on your DB without slowing down the server, a Read Replica can be made to asyncronously allow the client to have read access without affecting the production application
+- Read replicas are only for querying (SELECT, not INSERT/UPDATE)
+
+## RDS Multi-AZ
+
+- Associated with Disaster Recovery
+- Synchronous Replication
+- Increase availability
+- Failover in case of loss of AZ, loss of network, instance or storage failure
+- No manual intervention in apps
+- Not used for scaling
+
+- No one can read from it, no one can write to it, it's just there as a standby in case of an emergency
+- You *can* set up read replicas as a Multi-AZ Disaster Recovery
+
+## RDS Custom
+
+- Managed Oracle and Microsoft SQL Server DB with OS and database customization
+- RDS Custom
+    - RDS: Automates setup, operation, and scaling
+    - Custom: Access to underlying DB and OS so you can:
+        - Configure settings
+        - Install patches
+        - Enable native features
+        - Access the underlying EC2 Instance using SSH or SSM Session Manager
+- De-activate Automation Mode to perform your customization
+    - Better to take a DB snapshot before
+
+### RDS vs RDS Custom
+
+- RDS: Entire DB and the OS to be managed by AWS
+- RDS Custom: Full admin access to the underlying OS and the DB
+
+## Amazon Aurora
+
+- Proprietary Technology from AWS
+- Postgres and MySQL are both supported as Aurora DB
+    - Drivers for both will work for Aurora DB
+- Aurora is "AWS cloud optimized" and is signifantly faster than MySQL/Postgres
+- Aurora storage automatically grows in increments of 10GB, up to 128TB
+- Can have up to 15 Read Replicas
+- Failover in Aurora is instataneous, it's HA native
+- Costs more than RDS, but much more efficient
+
+### High Availability and Read Scaling
+
+- 6 copies of your data across 3 AZ
+- Self-healing with peer-to-peer replication
+
+- One Aurora Instance takes writes (Master)
+- Master + up to 15 Aurora Read Replicas serve reads
+- Support for Cross Region Replication
+
+### Aurora DB Cluster
+
+- Writer Endpoint
+    - Always points to the master
+        - Even if the master fails, the client will still be connected to WE
+- Reader Endpoint
+    - Connection Load Balancing
+
+### Aurora Advanced Concepts
+
+- Aurora Replica Auto Scaling
+    - Automatically adds Read Replicas by extending the reader endpoint
+        - Brings down overall CPU usage
+- Aurora Custom Endpoints
+    - Define  a subset of Aurora Instances as a Custom Endpoint
+    - The Reader Endpoint is generally not used after defining Custom Endpoints
+        - Allows you to query only a subset of your Aurora replicas
+- Aurora Serverless
+    - Automated DB instatiation and auto-scaling based on actual usage
+    - Good for infrequent, intermittent or unpredictable workloads
+    - No capacity planning needed
+- Global Aurora
+    - Aurora Cross Region Read Replicas:
+        - Useful for disaster recovery
+        - Simple to put in place
+    - Aurora Global Database (recommended)
+        - 1 Primary Region (r/w)
+        - Up to 5 seconary (r-only) regions, replcation lag is less than 1 second
+        - Up to 16 Read Replicas per secondary region
+        - Helps for decreasing latency
+        - **Typical cross-region replacation takes less than 1 second**
+- Aurora Machine Learning
+    - Enables you to add ML-based predictions to your application via SQL
+    - Simple, optimized, and secure integration between Aurora and AWS ML services
+    - Supports:
+        - Amazon SageMaker
+        - Amazon Comprehend
+    - You don't need ML experience
+    - Use Cases:
+        - Fraud detection
+        - Ads targeting
+        - Sentiment analysis
+        - Product recommendations
