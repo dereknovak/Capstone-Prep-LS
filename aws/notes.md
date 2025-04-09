@@ -971,6 +971,7 @@ Set Capacities:
         - Up to 5 seconary (r-only) regions, replcation lag is less than 1 second
         - Up to 16 Read Replicas per secondary region
         - Helps for decreasing latency
+        - Allows you to have an Aurora Replica in another AWS Region
         - **Typical cross-region replacation takes less than 1 second**
 - Aurora Machine Learning
     - Enables you to add ML-based predictions to your application via SQL
@@ -984,3 +985,153 @@ Set Capacities:
         - Ads targeting
         - Sentiment analysis
         - Product recommendations
+
+## RDS Backup
+
+- Automated Backups
+    - Daily full backup of the DB
+        - Happens during backup window
+    - Transaction logs are backed-up by RDS every 5 mins
+        - Ability to restore to any point in time
+            - Oldest => 5 mins ago
+    - 1-35 days of retention
+        - set 0 to disable automated backups
+- Manual DB Snapshots
+    - Manually triggered by user
+    - Retention of backup for as long as you want
+        - Automated will expire
+  
+- Trick
+    - In a stopped RDS database, you will still pay for storage
+    - If you plan on stopping for a long time, you should snapshot and restore instead
+
+## Aurora Backups
+
+- Automated Backups
+    - 1-35 days (cannot be disabled)
+    - Point-in-Time recovery in that timeframe
+- Manual DB Shapshots
+    - Manually triggered by user
+    - Retention of backup for as long as you want
+
+## Restore Options
+
+- Restoring a RDS/Aurora backup or snapshot creates a new DB
+- Restoring MySQL RDS database from S3
+    - Create a backup of your on-premises DB
+    - Store it on Amazon S3 (object storage)
+    - Restore the backup onto a new RDS instance running MySQL
+- Restoring MySQL Aurora cluster from S3
+    - Create a backup of your on-premises DB using Percona XtraBackup
+    - Store the backup file on Amazon S3
+    - Restore the backup file onto a new Aurora cluser running MySQL
+
+## Aurora DB Cloning
+
+- Create a new Aurora DB Cluster from an existing one
+- Faster than snapshot and restore
+- Uses copy-on-write protocol
+    - New DB cluster uses the same data volume as original DB cluster initially
+    - With updates on new DB cluster data, additional storage is allocated and data is copied separately
+- Very fast/cost-effective
+- Useful to create a 'staging' DB from a 'production' DB without impacting the production DB
+
+## RDS and Aurora Security
+
+- At-rest encryption
+    - DB master and replicas encryption using AWS KMS - must be defined at launch time
+    - If master is not encrypted, the read replicas cannot be encrypted
+    - To encypt an un-encrypted  DB, go through a DB snapshot and restore as encrypted
+- In-flight encryption
+    - TLS-read by default
+    - Use the AWS TLS root certificates client-side
+- IAM Authentication
+    - IAM roles to connect to your DB (instead of User/PW)
+- Security Groups
+    - Control Network access to your RDS / Aurora DB
+- No SSH available, except on RDS Custom
+- Audit Logs can be enabled and sent to CloudWatch Logs for longer retention
+
+## RDS Proxy
+
+- Fully managed DB proxy for RDS
+- Allows apps to pool and share DB connections established with the DB
+- Improves DB efficiency by reducing the stress on DB resources and minimize open conenctions/timeouts
+- Serverless, autoscaling, highly available (Multi-AZ)
+- Reduced RDS and Aurora failover time by up to 66%
+- Supports RDS
+- No code changes required for most apps
+    - Just connect to proxy rather than RDS/Aurora DB
+- Enforce IAM Authentication for DB
+    - Securely stores credentials in AWS Secrets Manager
+- RDS Proxy is never publicly acccessible
+    - Must be accessed from VPC
+
+# Amazon ElastiCache
+
+- ElastiCache is use to get managed Redis or Memcached
+    - Similar to how RDS is used to manage DB
+- Caches are in-memory DB with really high performance/low latency
+- Helps reduce load off of DB for read intensive workloads
+- Helps make your application stateless
+- AWS handles:
+    - OS maintenance/patching
+    - optimizations
+    - setup
+    - monitoring
+    - failure recovery
+- **Using ElastiCache involves heavy code changes**
+
+- Architectures
+    - DB Cache
+        - Applications queries ElastiCache
+            - If not available, get from RDS and store in ElastiCache
+        - Helps relieve load in RDS
+        - Cache must have an invalidation strategy to make sure only the most current data is used there
+    - User Session Store
+        - User logs into any of the application
+        - The application writes the session data into ElastiCache
+        - The user hits another instance of our application
+        - The instance retrieves the data and the user is already logged in
+
+## Redis vs Memcached
+
+- Redis
+    - REPLICATION (Node => Node)
+    - Muti-AZ with Auto-Failover
+    - Read Replicas to scale reads and have high availability
+    - Data Durability using AOF persistence
+    - Backup and restore features
+    - Supports Sets and Sorted Sets
+- Memcached
+    - SHARDING (Node + Node)
+    - Multi-node for partitioning of data (sharding)
+    - No High Availability (replication)
+    - Non-persistent
+    - Backup and restore (serverless)
+    - Multi-threaded architecture
+
+## Security
+
+- Supports IAM Authentication for Redis
+    - Everything else requires user/pw
+- IAM policies on ElastiCache are only used for AWS API-level security
+- Redis AUTH
+    - You can set a pw/token when you create a Redis Cluster
+    - This is an extra level of security for your cache
+    - Supports SSL in flight encryption
+- Memcached
+    - Supports SASL-based authentication
+
+## Patterns
+
+- Lazy Loading
+    - All read data is cached
+    - Data can become stale in cache
+- Write Through
+    - Adds or updates data in the cache when written to a DB
+    - No stale data
+- Session Store
+    - Store temporary session data in a cache with TTL (Time-To-Live) features
+
+
