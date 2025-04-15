@@ -67,7 +67,8 @@
 
 - Docker Container
     - A running instance of an image
-    - Adds a read/write component
+    - Adds a write component
+        - Now read/write
     - Allows data to be stored within that container and allows that Container to be run on a Docker Host
     - Each has a unique writable layer that keeps them isolated while using the same image
     - Actually starts the application
@@ -188,23 +189,49 @@ docker pull {name}:{tag}
 
 ## Directives
 
+- Convention to be in all caps to distinguish them from arguments
+
 - FROM
+    - Sets the base image for a build
     - Build this image from the specified image
     - Use the application used to build the image
         - If its an Express App, use `node`
-- COPY
-    - Copies files or directories from <src> and adds them to the filesystem of the container at the path <dest>
-    - While `RUN` is executed in the container, `COPY` is executed on the host
-- RUN
-    - Will execute any command in a shell *inside* the container environment
+- LABEL
+    - Adds metadata to an Image
+        - eg. `description/maintainer`
 - WORKDIR
     - Sets the *working directory* for all following commands
     - Similar to changing into a directory using `cd`
+
+### LAYER 1
+
+- COPY
+    - Copies files or directories from <src> and adds them to the filesystem of the container at the path <dest>
+    - While `RUN` is executed in the container, `COPY` is executed on the host
+- ADD
+    - Same as `COPY`, but can add from a remote URL & do extraction
+        - eg. Adding application/web files
+
+### LAYER 2
+
+- RUN
+    - Will execute any command in a shell (new layer) *inside* the container environment
+
+### LAYER 3
+
 - CMD
     - Last command in the Dockerfile
+    - Sets the default executable of a container & arguments
     - The instruction that is to be executed when a Docker Container starts
+    - Can be overriden via Docker run parameters
     - There can only be one `CMD` instruction in a Dockerfile
     - `[{command}, {parameter}]`
+- ENTRYPOINT
+    - Same as above, but can't be overwritten
+    - Creates a *single purpose image
+- EXPOSE
+    - Informs Docker what port the container app is running on
+        - Metadata only, no network configuration
 
 ```Dockerfile
 FROM {image}:{version}
@@ -246,6 +273,79 @@ CMD ['node', 'server.js']
         - `-t` => Sets a name and optionally a tag `name:tag`
     - `docker build -t {app_name}:{version} {location_of_Dockerfile}`
     - `docker build -t node-app:1.0 .`
+
+# Storage
+
+- Understanding storage is critical for allowing you to use Docker Images in an effective way
+- Avoids data loss
+- Helps you make sure you run Containers as you intend to
+
+## The Writable Layer
+
+- Writable layer allows every Docker Container to be their own separate thing
+- The Container sees both the read/write layers as a *single file system*
+
+## File Systems
+
+- tmpfs
+    - Fast in memory storage
+    - Not persistent
+    - Cannot be shared between containers
+    - Use for *temporary storage*
+- Bind Mounts
+    - Take a folder on Host System and mount them inside of containers
+    - One folder in a file system can be accessed by multiple conatiners of the same host
+    - Beneficial for sharing access access to data stored on the Host
+    - Any containers that rely on this rely on a certain structure existing on the Host
+        - Reduced portability
+    - Will live on past the lifetime of the containers
+- Volumes
+    - Similar to Bind Mounts, but managed by Docker
+    - Exist outside of the lifecycle of a container
+    - Can be moved between containers and can link containers
+        - No file locking, so be careful about multiple processes on multiple Containers accessing files at the same time
+
+# Networking
+
+- Host Networking
+    - Containers share the hosts network
+    - Don't get to choose the port mappings
+        - Containers cannot use the same ports
+    - Simple, no configuration needed
+- Bridge Networking
+    - Containers are connected to the Bridge Network
+    - Each container receives its own IP address
+        - Multiple containers can share the same port
+    - Containers on the Bridge Network can communicate
+    - Cannot be reached from outside of the Docker Host
+        - You can publish a Container Port to a Host Port
+            - `HostPort:ContainerPort`
+            - `-p 1337:1337`
+
+# Volumes
+
+- Volumes are created:
+    - Explicitly
+        - You run `docker volume create`
+    - Implicitly
+        - Specify to use a Volume on the `run` command
+            - One gets created if it doesn't already exist
+
+- Persists data, even when Containers are removed
+
+# Compose
+
+- Used to Create, Manage, and Cleanup Applications
+- Multi-Container Applications
+- Reads a Docker Compose File
+    - `compose.yaml`
+    - `docker-compose.yaml`
+- Docker Creates, Updates, or Deletes based upon the Compose file
+
+- `docker compose up -d`
+    - Running Containers and creating any named Volumes
+- `docker compose down`
+    - Stops containers listed in the `docker.compose` file
 
 # Docker in Big Picture
 
