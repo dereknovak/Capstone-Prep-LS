@@ -1134,4 +1134,147 @@ Set Capacities:
 - Session Store
     - Store temporary session data in a cache with TTL (Time-To-Live) features
 
+# Amazon S3
 
+- Main building blocks of AWS
+- "Infinitely scaling storage"
+
+## Use Cases
+
+- Backup and storage
+- Disaster Recovery
+- Archiving
+- Hybrid Cloud Storage
+- Application Hosting
+- Media Hosting
+- Data Lakes and Big Data Analytics
+- Software Delivery
+- Static Websites
+
+## Buckets
+
+- Objects are stored in Buckets
+- Must have a globally unique name
+    - across all regions and all accounts
+- Defined at the Region level
+- Naming Convention
+    - No uppercase, no underscore
+    - 3-63 chars long
+    - Not an IP
+    - Must start with lowercase letter or number
+    - Not start with prefix xn--
+    - Not end with suffix -s3alias
+
+## Objects
+
+- Objects are files with a key
+- The key is the FULL path
+    - s3://my-bucket/<my_file.txt>
+    - s3://my-bucket/<my_folder1/another_folder/my_file.txt>
+- Key is composed of *prefix* + *object name*
+    - `my_folder/another_folder/`
+    - `my_file.txt`
+- No concept of 'directories' within buckets
+
+- Object values are the content of the body
+- Metadata
+    - List of text key/value pairs
+- Tags
+    - Unicode key/value pair
+    - useful for security/lifecycle
+- Version ID
+
+## Security
+
+- User-Based
+    - IAM Policies
+- Resource-Based
+    - Bucket Policies
+    - Object Access Control List (ACL)
+    - Bucket Access Control List (ACL)
+
+- An IAM principal can access an S3 object if:
+    - The user IAM permissions allow it OR the Resource Policy allows it
+    - AND no explicit Deny
+
+- Encryption Key
+
+### Bucket Policies
+
+- JSON based policies
+    - Resources
+    - Effect
+    - Actions
+    - Principal
+
+- Use Bucket Policy to:
+    - Grant public access to the bucket
+    - Force objects to be encrypted at upload
+    - Grant access to another account
+
+## Static Website Hosting
+
+- S3 can host static websites and have them accessible on the internet
+- URL format
+    - `http://bucket-name.s3.website-aws-region.amazonaws.com`
+    - `http://bucket-name.s3-website-aws-region.amazonaws.com`
+
+- 403 Forbidden error => Needs to be public (unsafe!)
+
+## Versioning
+
+- Enabled at the bucket level
+- Best practice to version your buckets
+    - Protects against unintended deletes
+    - Easy to roll back to previous version
+
+## Replication (CRR and SRR)
+
+- Cross-Region Replication (CRR)
+- Same-Region Replication (SRR)
+
+- Must enable versioning in source and destination buckets
+- Buckets can be in different AWS accounts
+- Copying is asynchronous
+- Must give proper IAM permissions to S3
+
+- Use Cases:
+    - CRR
+        - Compliance
+        - lower latency access
+        - replication
+    - SRR
+        - Log aggregation
+        - Live replication between production and test accounts
+
+## Storage Classes
+
+- Amazon S3 Standard (General Purpose)
+    - Big Data Analytics
+    - Mobile/Gaming apps
+    - Content Distribution
+- Amazon S3 Standard-Infrequent Access
+    - Disaster Recovery
+    - Backups
+- Amazon S3 One Zone-Infrequent Access
+    - Storing secondary backups of on-premise data
+- Amazon S3 Glacier Instant Retrieval
+    - Access data once/quarter
+- Amazon S3 Glacier Flexible Retrieval
+    - Expedited (1-5 mins)
+    - Standard (3-5 hrs)
+    - Bulk (5-12 hrs)
+- Amazon S3 Glacier Deep Archive
+    - Standard (12 hrs)
+    - Bulk (48 hrs)
+- Amazon S3 Intelligent Tiering
+
+### Durability and Availability
+
+- Durability
+    - How many times an object will be lost by S3
+    - High Durability - 99.9999999% percent
+
+- Availability
+    - How readily available a service is
+    - 53 minutes/year will not be available
