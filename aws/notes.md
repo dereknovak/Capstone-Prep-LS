@@ -1278,3 +1278,108 @@ Set Capacities:
 - Availability
     - How readily available a service is
     - 53 minutes/year will not be available
+
+# CloudFront
+
+- Content Delivery Network (CDN)
+    - When you see CDN, think CloudFront
+- Improves read performance
+    - Content is chached at edge locations
+- Improves users experience
+- DDoS Protection
+    - An Attack where all of your servers from around the world are being attacked at the same time
+    - Integration with Shield and AWS Web Application Firewall
+
+## Origins
+
+- Backends that you want to connect CloudFront to
+
+- S3 Bucket
+    - Distribute files and caching them at the edge
+    - Upload files to S3 through CF
+    - Secured using Origin Access Control (OAC)
+- VPC Origin
+    - For applications hosted in VPC private subnets
+    - ALB/NLB/EC2
+- Custom Origin (HTTP)
+    - S3 Website
+    - Any public HTTP backend you want
+        - Both in/out of AWS
+
+## CloudFront vs S3 CRR
+
+- CloudFront
+    - Global Edge network
+    - Files are cached for TTL
+    - Great for static content that must be available everywhere
+- S3 CRR
+    - Must be setup for each region
+    - FIles are updated in near real-time
+    - Read-only
+    - Great for dynamic content that needs to be available at low-latency in a few regions
+
+## ALB or EC2 as Origin
+
+- Use VPC Origins
+    - Allows you to deliver content from your application hosted in your VPC private subnets
+        - No need to expose them on the internet
+    - Deliver traffic to *private*:
+        - ALB
+        - NLB
+        - EC2 Instances
+
+## Geo Restrictions
+
+- You can restrict who can access your distribution
+    - Allowlist
+    - Blocklist
+
+- The 'country' is determined using a 3rd party Geo-IP database
+- Use case:
+    - Copyright Laws to control access to content
+
+## Cache Invalidations
+
+- In case you update the back-end origin, CloudFront doesn't know about it and will only get the refreshed content after the TTL has expired
+- However, you can force an entire or partial cache refresh by performing a **CloudFront Invalidation**
+- You can invalidate all files `*` or a special path `/images/*`
+
+## Global Accelerator
+
+- Leverage the AWS internal network to route to your application
+
+1. 2 Anycast IPs are created for your application
+    - Anycast IP: All servers hold the same IP address and the client is routed to the nearest one
+2. The Anycast IP sends traffic directly to Edge Locations
+3. The Edge Locations send the traffic to your application
+
+- Works with:
+    - Elastic IP
+    - EC2 Instances
+    - ALB/NLB
+    - Public or Private
+- Consistent Performance
+    - Intelligent Routing
+    - No issue with Client Cache (IP doesn't change)
+    - Internal AWS network
+- Health Checks
+- Security
+    - Only 2 external IP need to be whitelisted
+    - DDos Protection
+
+## Global Accelerator vs CloudFront
+
+- Same
+    - Use AWS global network and its edge locations
+    - Intergrate with AWS Shield for DDoS protection
+
+- Different
+    - CloudFront
+        - Improves performance for both cacheable content
+        - Dynamic content
+        - Content is served at edge locations
+    - Global Accelerator
+        - Improves performance for applications over TCP/UDP
+        - Proxying packets at the edge
+        - Good fit for non-HTTP use cases
+        - Good for HTTP cases that require static IP addresses
