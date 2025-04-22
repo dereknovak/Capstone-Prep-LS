@@ -353,6 +353,7 @@ COME BACK TO ID/DIR
 
 - index => indexOf
 - zip() => zip (Ruby)
+    - In Python, `zip` returns an iterator
 - dict.keys() => Object.keys()
     - Returns a dictionary view object
         - Any mutations to dict will be reflected here
