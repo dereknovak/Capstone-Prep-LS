@@ -1383,3 +1383,252 @@ Set Capacities:
         - Proxying packets at the edge
         - Good fit for non-HTTP use cases
         - Good for HTTP cases that require static IP addresses
+
+# Integration and Messaging
+
+- Applications need to communicate with one another
+- 2 Patterns
+    - Synchronous
+        - App to App
+        - Buying Service -> Shipping Service
+    - Asynchronous
+        - Event based
+        - App to Queue to App
+        - Buying Service -> Queue -> Shipping Service
+
+## Synchronous
+
+- Can be a problem if there is a spike in traffic
+    - To fix, *decouple* application
+        - SQS (queue)
+        - SNS (pub/sub)
+        - Kinesis (streaming)
+
+## Amazon SQS
+
+- Used to **decouple applications**
+
+- Attributes
+    - Unlimitted throughput
+        - Unlimited number of messages in queue
+    - Default retension of messages
+        - 4 days, max of 14
+    - Low latency
+- Can have duplicate messages
+- Can have out-of-order messages
+
+### What's a Queue?
+
+- Producers send messages into a queue
+    - Process this ____
+- Consumers poll messages from queue
+    - Do you have any ___ that I can process?
+
+### Producing Messages
+
+- Produced to SQS using the SDK (Software Development Kit)
+- Message is persisted in SQS until consumer deletes it
+
+- Example
+    - Sent order to be processed
+        - Order id
+        - Customer id
+        - Any attributes
+
+### Consuming Messages
+
+- Consumers
+    - Running on EC2 instances, servers, AWS Lambda, etc...
+- Poll SQS for messages
+    - Up to 10 messages at a time
+- Process the messages
+- Delete the messages using DeleteMessage API
+
+### Security
+
+- Encryption
+    - In-flight encryption with HTTPS API
+    - At-rest encryption with KMS keys
+    - Client-side encryption if desired
+
+- Access Controls
+    - IAM policies
+    - SQS Access Policies
+
+### Message Visibility Timeout
+
+- When a message is polled, it becomes *invisible* to other consumers
+    - Default timeout is 30 seconds
+
+### Long Polling
+
+- Waiting for messages to arrive if none are in the queue
+- Decreases the number of API calls to SQS
+    - Reduces latency
+
+### FIFO Queues
+
+- First In First Out
+  - 4321 -> 4321
+  - Ordering by Message Group ID
+- SQS Standard may have messages out of order
+
+## Amazon SNS
+
+- Amazon Simple Notification Service
+
+- Send 1 message to many receivers
+    - Use Pub/Sub
+        - Publish/Subscribe
+
+- Rather than sending a message individually to a bunch of clients...
+    - Subscribers will immediately receive any published topic
+
+- Event Producer
+    - Only sends messages to SNS topic
+- All Event Receivers
+    - Gets all messages
+
+### Topics
+
+- Emails
+- SMS and Mobile Notifications
+- HTTP(S) Endpoints
+- SQS
+- Lambda
+- Kinesis Data Firehose
+
+### Receives from...
+
+- CloudWatch Alarms
+- AWS Budgets
+- Lambda
+- ASG
+- ......all AWS
+
+### How to Publish
+
+- Topic Publish
+    - Create a topic
+    - Create a subscription
+    - Publish to the topic
+
+- Direct Publish (mobile apps SDK)
+    - Create platform app
+    - Create platform endpoint
+    - Publish to platform endpoint
+
+### Security
+
+- Encryption
+    - In-flight encryption with HTTPS API
+    - At-rest encryption with KMS keys
+    - Client-side encryption if desired
+
+- Access Controls
+    - IAM policies
+    - SNS Access Policies
+
+### Filter Policies
+
+- Can be used to filter messages sent to SNS topics
+    - Allows only specific users to receive messages
+
+## Amazon Kinesis Data Streams
+
+- Collect and store streaming data in **real-time**
+- Real-Time data -> Producers -> KDS -> Consumers
+
+- Real-Time Data
+    - Click Streams
+    - IoT Devices
+        - Bicycles
+    - Metrics and Logs
+- Producers
+    - Applications
+    - Kinesis Agent
+- Consumers
+    - Application
+    - Lambda
+    - Amazon Data Firehose
+    - Managed Service for Apache Flink
+
+- Retension up to 365 days
+- Can reprocess (replay) data by consumers
+
+- Kinesis Producer Library (KPL)
+- Kinesis Client Library (KCL)
+
+### Capacity Modes
+
+- Provisioned mode
+    - Choose number of shards
+    - Scale manually to increase/decrease shards
+
+- On-demand mode
+    - No need to provision or manage capacity
+    - Scale automatically
+
+## Amazon Data Firehouse
+
+- Service to send data from sources into target destinations
+
+- Sources
+    - Applications
+    - Client
+    - SDK
+    - Kinesis Agent
+    - KDS
+    - CloudWatch
+    - AWS IoT
+- Destinations
+    - AWS
+        - S3
+        - RedShift
+        - OpenSearch
+    - 3rd Party
+        - Datadog
+        - Splunk
+        - New Relic
+        - mongoDB
+    - Custom
+        - HTTP Endpoint
+
+- Near Real-Time
+
+## SQS vs SNS vs Kinesis
+
+- SQS
+    - Consumer 'pull data'
+    - Data is deleted after being consumed
+    - Can have as many consumers as desired
+    - No need to provision throughput
+    - Ordering guarantees only on FIFO queues
+    - individual message delay capability
+- SNS
+    - Push data to many subscribers
+    - Up to 12.5m subscribers
+    - Data is not persisted
+    - Pub/Sub
+    - Up to 100k topics
+    - No need to provision throughput
+    - Integrates with SQS for fan-out arch pattern
+    - FIFO capability for SQS FIFO
+- Kinesis
+    - Standard: pull data
+    - Enhanced-fan out: push data
+    - Possibility to replay data
+    - Meant for real-time big data, analytics, and ETL
+    - Ordering at the shard level
+    - Data expires after X days
+    - Provisioned mode or On-demand capacity mode
+
+## Amazon MQ
+
+- Managed message broker
+    - RabbitMQ
+    - ActiveMQ
+- Doesn't scale as much as SQS/SNS
+- Runs on servers
+    - Can use Multi-AZ w/ failover
+- Has both queue features (SQS) and topic features (SNS)
